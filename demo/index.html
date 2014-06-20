@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="./demo.css">
+        <title>Hashspace - Bootstrap</title>
+        <script src="http://noder-js.ariatemplates.com/dist/master/noder.min.js" type="text/javascript">
+        {
+            packaging: {
+                baseUrl: "/"
+            }
+        }
+        </script>
+        <script src="http://hashspace.ariatemplates.com/dist/0.0.4/hashspace-noder.min.js" type="text/javascript"></script>
+        <!--<script src="./hashspace-bootstrap.js" type="text/javascript"></script>
+        <script src="./hashspace-bootstrap-demo.js" type="text/javascript"></script>-->
+        <script type="noder">
+            var carousel = require('./demo/carousel/demo.hsp').demo;
+            carousel().render(document.body);
+        </script>
+        
+    </head>
+    <body>
+    </body>
+</html>

@@ -1,0 +1,5 @@
+var CarouselController = require("./carousel").CarouselController;
+
+{export template carousel using ctrl:CarouselController}
+    <h1 class="carousel">Hello carousel</h1>
+{/template}
