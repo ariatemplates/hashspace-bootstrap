@@ -1,0 +1,9 @@
+var description = require('./README.hsp').description;
+var carouselCpt = require('../../carousel/carousel.hsp').carousel;
+
+{export template demo()}
+    This is a demo of the carousel component!
+    <#carouselCpt />
+    Updated again!
+    <#description />
+{/template}
