@@ -1,17 +1,17 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var watch = require('gulp-watch');
+var template = require('gulp-template');
 var markdown = require('gulp-markdown');
 var hsp = require('gulp-hashspace');
 var clean = require('gulp-clean');
 var uglify = require('gulp-uglify');
 var jshint = require('gulp-jshint');
-var html2hsp = require('./build/gulp-html2hsp');
-var removehtmlcommenttags = require('./build/gulp-removehtmlcommenttags');
 var http = require('http');
 var karma = require('karma').server;
 var connect = require('connect');
 var _ = require('lodash');
+var through2 = require('through2');
 
 
 require('gulp-grunt')(gulp);
@@ -19,6 +19,8 @@ var wwwServerPort = 8080;
 var _destFolder = "target";
 var _devFolder = _destFolder + "/dev";
 var _prodFolder = _destFolder + "/prod";
+var hspVersion = require('hashspace/package.json').version;
+var packages = ['hashspace-bootstrap', 'hashspace-bootstrap-demo'];
 
 var karmaCommonConf = {
     browsers: ['Chrome'],
@@ -42,6 +44,16 @@ var karmaCommonConf = {
     }
 };
 
+function html2hsp() {
+    return through2.obj(function(file, encoding, done) {
+        var content = "{export template description()}\r\n" + String(file.contents) + "\r\n{/template}";
+        file.contents = new Buffer(content);
+        file.path = gutil.replaceExtension(file.path, ".hsp");
+        this.push(file);
+        done();
+    });
+}
+
 gulp.task('checkstyle', function() {
     return gulp.src(['src/**/*.js', 'demo/**/*.js', 'test/**/*.js', 'build/**/*.js']).pipe(jshint()).pipe(jshint.reporter("default")).pipe(jshint.reporter("fail"));
 });
@@ -51,7 +63,7 @@ gulp.task('clean', ['checkstyle'], function(){
 });
 
 gulp.task('build', ['clean'], function() {
-    gulp.src(['demo/**/*.html', 'demo/**/*.css']).pipe(gulp.dest(_devFolder));
+    gulp.src(['demo/**/*.html', 'demo/**/*.css']).pipe(template({version: hspVersion, packages: []})).pipe(gulp.dest(_devFolder));
     gulp.src('demo/**/*.md').pipe(markdown()).pipe(html2hsp()).pipe(hsp.compile()).pipe(gulp.dest(_devFolder + '/demo'));
     gulp.src('demo/**/*.hsp').pipe(hsp.compile()).pipe(gulp.dest(_devFolder + '/demo'));
     gulp.src('demo/**/*.js').pipe(hsp.transpile()).pipe(gulp.dest(_devFolder + '/demo'));
@@ -65,7 +77,7 @@ gulp.task('test', ['checkstyle'], function (done) {
 
 gulp.task('play', ['clean'], function () {
     watch({glob: ['demo/**/*.html', 'demo/**/*.css']}, function (files) {
-        files.pipe(gulp.dest(_devFolder));
+        files.pipe(template({version: hspVersion, packages: []})).pipe(gulp.dest(_devFolder));
     });
     watch({glob: 'demo/**/*.md'}, function (files) {
         files.pipe(markdown().on('error', gutil.log)).pipe(html2hsp()).pipe(hsp.compile()).pipe(gulp.dest(_devFolder + '/demo'));
@@ -89,7 +101,7 @@ gulp.task('tdd', function (done) {
 });
 
 gulp.task('package', ['build', 'grunt-package'], function() {
-    gulp.src([_devFolder + '/**/*.html', _devFolder + '/**/*.css']).pipe(removehtmlcommenttags()).pipe(gulp.dest(_prodFolder));
+    gulp.src(['demo/**/*.html', 'demo/**/*.css']).pipe(template({version: hspVersion, packages: packages})).pipe(gulp.dest(_prodFolder));
     gulp.src(_prodFolder + '/*.js').pipe(uglify()).pipe(gulp.dest(_prodFolder));
 })
 
