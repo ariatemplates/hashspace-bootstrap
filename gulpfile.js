@@ -25,8 +25,7 @@ var packages = ['hashspace-bootstrap', 'hashspace-bootstrap-demo'];
 var karmaCommonConf = {
     browsers: ['Chrome'],
     files: [
-        'src/**/*.hsp',
-        'src/**/*.js',
+        'src/**/*.+(hsp|js)',
         'test/**/*.spec.js',
         './node_modules/hashspace/hsp/*.js',
         './node_modules/hashspace/hsp/rt/**/*.js',
@@ -43,6 +42,11 @@ var karmaCommonConf = {
         modulesRoot: './node_modules/hashspace'
     }
 };
+
+function startWWWServer(folder) {
+    gutil.log('Starting WWW server at http://localhost:' + wwwServerPort);
+    http.createServer(connect().use(connect.static('./' + folder))).listen(wwwServerPort);
+}
 
 function html2hsp() {
     return through2.obj(function(file, encoding, done) {
@@ -65,10 +69,8 @@ gulp.task('clean', ['checkstyle'], function(){
 gulp.task('build', ['clean'], function() {
     gulp.src(['demo/**/*.html', 'demo/**/*.css']).pipe(template({version: hspVersion, packages: []})).pipe(gulp.dest(_devFolder));
     gulp.src('demo/**/*.md').pipe(markdown()).pipe(html2hsp()).pipe(hsp.compile()).pipe(gulp.dest(_devFolder + '/demo'));
-    gulp.src('demo/**/*.hsp').pipe(hsp.compile()).pipe(gulp.dest(_devFolder + '/demo'));
-    gulp.src('demo/**/*.js').pipe(hsp.transpile()).pipe(gulp.dest(_devFolder + '/demo'));
-    gulp.src('src/**/*.hsp').pipe(hsp.compile()).pipe(gulp.dest(_devFolder));
-    gulp.src('src/**/*.js').pipe(hsp.transpile()).pipe(gulp.dest(_devFolder));
+    gulp.src('demo/**/*.+(hsp|js)').pipe(hsp.process()).pipe(gulp.dest(_devFolder + '/demo'));
+    gulp.src('src/**/*.+(hsp|js)').pipe(hsp.process()).pipe(gulp.dest(_devFolder));
 });
 
 gulp.task('test', ['checkstyle'], function (done) {
@@ -85,15 +87,11 @@ gulp.task('play', ['clean'], function () {
     watch({glob: 'demo/**/*.hsp'}, function (files) {
         files.pipe(hsp.compile().on('error', gutil.log)).pipe(gulp.dest(_devFolder + '/demo'));
     });
-    watch({glob: 'src/**/*.hsp'}, function (files) {
-        files.pipe(hsp.compile().on('error', gutil.log)).pipe(gulp.dest(_devFolder));
-    });
-    watch({glob: 'src/**/*.js'}, function (files) {
-        files.pipe(hsp.transpile().on('error', gutil.log)).pipe(gulp.dest(_devFolder));
+    watch({glob: 'src/**/*.+(hsp|js)'}, function (files) {
+        files.pipe(hsp.process().on('error', gutil.log)).pipe(gulp.dest(_devFolder));
     });
 
-    gutil.log('Starting WWW server at http://localhost:' + wwwServerPort);
-    http.createServer(connect().use(connect.static('./' + _devFolder))).listen(wwwServerPort);
+    startWWWServer(_devFolder);
 });
 
 gulp.task('tdd', function (done) {
@@ -106,8 +104,7 @@ gulp.task('package', ['build', 'grunt-package'], function() {
 })
 
 gulp.task('www', ['package'], function() {
-    gutil.log('Starting WWW server at http://localhost:' + wwwServerPort);
-    http.createServer(connect().use(connect.static('./' + _prodFolder))).listen(wwwServerPort);
+    startWWWServer(_prodFolder);
 });
 
 gulp.task('default', ['package']);
