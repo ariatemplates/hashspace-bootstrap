@@ -15,11 +15,11 @@
         </script>
         <script src="http://hashspace.ariatemplates.com/dist/<%= version %>/hashspace-noder.min.js" type="text/javascript"></script>
         <% _.forEach(packages, function(name) { %><script src="./<%- name %>.js" type="text/javascript"></script><% }); %>
-        <script type="noder">
+        <script type="application/x-noder">
             var carousel = require('./demo/carousel/demo.hsp').demo;
             carousel().render(document.body);
         </script>
-        
+
     </head>
     <body>
     </body>
