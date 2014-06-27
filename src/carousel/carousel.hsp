@@ -1,5 +1,39 @@
 var CarouselController = require("./carousel").CarouselController;
 
 {export template carousel using ctrl:CarouselController}
-    <h1 class="carousel">Hello carousel</h1>
+    <div class="carousel slide" onmouseover="{ctrl.toggleOnHover()}" onmouseout="{ctrl.toggleOnHover()}" onswipe="{ctrl.handleSwipe(event)}">
+        {if ctrl.content.length > 1}
+            <ol class="carousel-indicators">
+                {foreach idx, slide in ctrl.content}
+                    <li class="{'active': idx === ctrl.internalIndex}" onclick="{ctrl.navigate(idx)}"></li>
+                {/foreach}
+            </ol>
+        {/if}
+        <div class="carousel-inner">
+            {foreach idx, slide in ctrl.content}
+                <div class="{'item','active': idx === ctrl.internalIndex,
+                'prev': idx === ctrl.nextIndex && ctrl.ongoingNavigation === "prev",
+                'next': idx === ctrl.nextIndex && ctrl.ongoingNavigation === "next",
+                'left': (idx === ctrl.internalIndex || idx === ctrl.nextIndex) && ctrl.navigationDirection === "left",
+                'right':(idx === ctrl.internalIndex || idx === ctrl.nextIndex) && ctrl.navigationDirection === "right"}">
+                    <#slide.body/>
+                    {if slide.caption}
+                        <div class="carousel-caption">
+                            <#slide.caption/>
+                        </div>
+                    {/if}
+                </div>
+            {/foreach}
+        </div>
+        {if ctrl.content.length > 1 &&  !(!ctrl.wrap && ctrl.internalIndex === 0)}
+            <a class="left carousel-control" onclick="{ctrl.prev()}">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+            </a>
+        {/if}
+        {if ctrl.content.length > 1 && !(!ctrl.wrap && ctrl.internalIndex === (ctrl.content.length - 1))}
+            <a class="right carousel-control" onclick="{ctrl.next()}">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+            </a>
+        {/if}
+    </div>
 {/template}

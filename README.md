@@ -20,16 +20,16 @@ To run the tests:
 
 - run `gulp test`
 
-To use the project in *dev* mode:
+To use the project in **dev** mode:
 
 - run `gulp build` to build it
-- run `gulp play` to build it and start a webserver which watches source files at http://localhost:8000
+- run `gulp play` to build it and start a webserver which watches source files at http://localhost:8080
 - run `gulp play tdd` to work in the TDD mode (i.e. watch source files to build and run all tests)
 
-To use the project in *production* mode:
+To use the project in **production** mode:
 
 - run `gulp` or `gulp package` to package it
-- run `gulp www` to package it and start a webserver at http://localhost:8000
+- run `gulp www` to package it and start a webserver at http://localhost:8080
 
 To clean all files created during builds:
 
