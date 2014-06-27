@@ -6,14 +6,19 @@
         <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
         <link rel="stylesheet" href="./demo.css">
         <title>Hashspace - Bootstrap</title>
-        <script src="http://noder-js.ariatemplates.com/dist/master/noder.min.js" type="text/javascript">
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+        <script src="http://noder-js.ariatemplates.com/dist/v<%= noderVersion %>/noder.min.js" type="text/javascript">
         {
             packaging: {
                 baseUrl: "/"
             }
         }
         </script>
-        <script src="http://hashspace.ariatemplates.com/dist/<%= version %>/hashspace-noder.min.js" type="text/javascript"></script>
+        <script src="http://hashspace.ariatemplates.com/dist/<%= hspVersion %>/hashspace-noder.min.js" type="text/javascript"></script>
         <% _.forEach(packages, function(name) { %><script src="./<%- name %>.js" type="text/javascript"></script><% }); %>
         <script type="application/x-noder">
             var carousel = require('./demo/carousel/demo.hsp').demo;

@@ -1,0 +1,344 @@
+var carousel = require('../../src/carousel/carousel.hsp').carousel;
+var doc = require("hsp/rt/document");
+var $set = require("hsp/$set");
+var hsp = require("hsp/rt");
+var fireEvent=require("hsp/utils/eventgenerator").fireEvent;
+var touchEventMap = require("hsp/gestures/touchEvent").touchEventMap;
+
+{template test(model)}
+    <#carousel interval="{model.interval}" index="{model.index}" noTransition="{model.noTransition}" wrap="{model.wrap}" pause="{model.pause}" 
+    onslidestart="{model.onslidestartCB()}" onslideend="{model.onslideendCB()}">
+        {if model.nbOfSlides > 0}
+            <@slide>
+                <@body>
+                    <img style="width: 800px; height: 400px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJL…Uc1hjAXC/bI2J9a4vgCQ5Jb/+/jS6xWKxWCwWi8ViseTNvxnvy7HgeRQ4AAAAAElFTkSuQmCC">
+                </@body>
+                <@caption>
+                    <h3>First slide label</h3>
+                    <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
+                </@caption>
+            </@slide>
+            {if model.nbOfSlides == 5}
+                <@slide>
+                    <img style="width: 800px; height: 400px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJL…Uc1hjAXC/bI2J9a4vgCQ5Jb/+/jS6xWKxWCwWi8ViseTNvxnvy7HgeRQ4AAAAAElFTkSuQmCC">
+                </@slide>
+            {/if}
+            {if model.nbOfSlides >= 3}
+                <@slide>
+                    <@body>
+                        <img style="width: 800px; height: 400px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJL…Uc1hjAXC/bI2J9a4vgCQ5Jb/+/jS6xWKxWCwWi8ViseTNvxnvy7HgeRQ4AAAAAElFTkSuQmCC">
+                    </@body>
+                    <@caption>
+                        <h3>Second slide label</h3>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                    </@caption>
+                </@slide>
+                <@slide>
+                    <img style="width: 800px; height: 400px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJL…Uc1hjAXC/bI2J9a4vgCQ5Jb/+/jS6xWKxWCwWi8ViseTNvxnvy7HgeRQ4AAAAAElFTkSuQmCC">
+                </@slide>
+            {/if}
+            {if model.nbOfSlides > 3}
+                <@slide>
+                    <img style="width: 800px; height: 400px;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABmJL…Uc1hjAXC/bI2J9a4vgCQ5Jb/+/jS6xWKxWCwWi8ViseTNvxnvy7HgeRQ4AAAAAElFTkSuQmCC">
+                </@slide>
+            {/if}
+        {/if}
+    </#carousel>
+{/template}
+
+
+
+describe('Carousel', function() {
+    var container;
+    var template;
+    var clock;
+    var model;
+    beforeEach(function(){
+        container = doc.createElement("div");
+        clock = sinon.useFakeTimers();
+    });
+    afterEach(function() {
+        if (template.root) {
+            template.$dispose();
+        }
+        template = null;
+        container = null;
+        clock.restore();
+    });
+
+    function instantiateTemplate(input) {
+        var nbOfSlides = typeof input.nbOfSlides === "undefined" ? 3 : input.nbOfSlides;
+        var index = typeof input.index === "undefined" ? 0 : input.index;
+        var interval = typeof input.interval === "undefined" ? -1 : input.interval;
+        var noTransition = typeof input.noTransition === "undefined" ? true : input.noTransition;
+        var wrap = typeof input.wrap === "undefined" ? true : input.wrap;
+        var pause = typeof input.pause === "undefined" ? "hover" : input.pause;
+        model = {nbOfSlides: nbOfSlides, index: index, interval: interval, noTransition: noTransition, wrap: wrap, pause: pause, onslidestartCB: function(){},onslideendCB: function(){}};
+        template = test(model);
+        template.render(container);
+    }
+
+    function getCarousel() {
+        return container.querySelectorAll(".carousel");
+    }
+    function getSlides() {
+        return container.querySelectorAll('.item');
+    }
+    function getLeftArrow() {
+        return container.querySelectorAll('a.left');
+    }
+    function getRightArrow() {
+        return container.querySelectorAll('a.right');
+    }
+    function getDots() {
+        return container.querySelectorAll('ol.carousel-indicators > li');
+    }
+
+    function testSlideActive(index) {
+        var slides = getSlides();
+        var activeSlides = [];
+        expect(index).to.be.below(slides.length);
+        for (var i = 0; i < slides.length; i++) {
+            if (slides[i].className.indexOf("active") > -1) {
+                activeSlides.push("" + i);
+            }            
+        }
+        expect(activeSlides.length).to.be(1);
+        expect(activeSlides[0]).to.eql(index);
+    }
+
+    it('should set the selected slide to index 1', function() {
+        instantiateTemplate({});
+        testSlideActive(0);
+        $set(model, "index", 1);
+        hsp.refresh();
+        testSlideActive(1);
+    });
+
+    it('should create clickable prev nav button', function() {
+        instantiateTemplate({});
+        expect(getLeftArrow()).to.have.length(1);
+        expect(getRightArrow()).to.have.length(1);
+    });
+
+    it('should display clickable slide indicators', function () {
+        instantiateTemplate({});
+        expect(getDots()).to.have.length(3);
+    });
+
+    it('should hide nav buttons when wrap is false', function () {
+        instantiateTemplate({wrap: false});
+        expect(getLeftArrow()).to.have.length(0);
+        $set(model, "index", 2);
+        hsp.refresh();
+        expect(getRightArrow()).to.have.length(0);
+    });
+
+    it('should hide navigation when only one slide', function () {
+        instantiateTemplate({nbOfSlides: 1});
+        expect(getSlides()).to.have.length(1);
+        expect(getLeftArrow()).to.have.length(0);
+        expect(getRightArrow()).to.have.length(0);
+        expect(getDots()).to.have.length(0);
+    });
+
+    it('should not fail when no slides', function() {
+        instantiateTemplate({nbOfSlides: 0});
+        expect(getSlides()).to.have.length(0);
+        expect(getLeftArrow()).to.have.length(0);
+        expect(getRightArrow()).to.have.length(0);
+        expect(getDots()).to.have.length(0);
+    });
+
+    it('should go to next when clicking next button', function() {
+        instantiateTemplate({});
+        var rightArrow = getRightArrow()[0];
+        testSlideActive(0);
+        fireEvent("click", rightArrow);
+        hsp.refresh();
+        testSlideActive(1);
+        fireEvent("click", rightArrow);
+        hsp.refresh();
+        testSlideActive(2);
+        fireEvent("click", rightArrow);
+        hsp.refresh();
+        testSlideActive(0);
+    });
+
+    it('should go to prev when clicking prev button', function() {
+        instantiateTemplate({});
+        var leftArrow = getLeftArrow()[0];
+        testSlideActive(0);
+        fireEvent("click", leftArrow);
+        hsp.refresh();
+        testSlideActive(2);
+        fireEvent("click", leftArrow);
+        hsp.refresh();
+        testSlideActive(1);
+        fireEvent("click", leftArrow);
+        hsp.refresh();
+        testSlideActive(0);
+    });
+
+    describe('swiping', function() {
+      it('should go next on swipe to the right', function() {
+        instantiateTemplate({});
+        testSlideActive(0);
+        var carousel = getCarousel()[0];
+        fireEvent(touchEventMap.touchstart, carousel, {clientX : 0, clientY : 0});
+        fireEvent(touchEventMap.touchmove, carousel, {clientX : 5, clientY : 0});
+        fireEvent(touchEventMap.touchend, carousel, {clientX : 15, clientY : 5});
+        hsp.refresh();
+        testSlideActive(1);
+      });
+
+      it('should go prev on swipe to the left', function() {
+        instantiateTemplate({});
+        testSlideActive(0);
+        var carousel = getCarousel()[0];
+        fireEvent(touchEventMap.touchstart, carousel, {clientX : 15, clientY : 0});
+        fireEvent(touchEventMap.touchmove, carousel, {clientX : 5, clientY : 0});
+        fireEvent(touchEventMap.touchend, carousel, {clientX : 0, clientY : 5});
+        hsp.refresh();
+        testSlideActive(2);
+      });
+    });
+
+    it('should select a slide when clicking on slide indicators', function () {
+        instantiateTemplate({});
+        testSlideActive(0);
+        fireEvent("click", getDots()[2]);
+        hsp.refresh();
+        testSlideActive(2);
+    });
+
+    it('shouldnt go forward if interval is NaN or negative', function() {
+        instantiateTemplate({});
+        clock.tick(1500);
+        testSlideActive(0);
+        $set(model, "interval", 1000);
+        hsp.refresh();
+        clock.tick(1500);
+        testSlideActive(1);
+        $set(model, "interval", false);
+        hsp.refresh();
+        clock.tick(1500);
+        testSlideActive(1);
+        $set(model, "interval", 1000);
+        hsp.refresh();
+        clock.tick(1500);
+        testSlideActive(2);
+    });
+
+    it('should be playing by default and cycle through slides', function() {
+        instantiateTemplate({interval: 1000});
+        testSlideActive(0);
+        clock.tick(1500);
+        testSlideActive(1);
+        clock.tick(1000);
+        testSlideActive(2);
+        clock.tick(1000);
+        testSlideActive(0);
+    });
+
+    it('should pause and play on mouseover', function() {
+        instantiateTemplate({interval: 1000});
+        var carousel = getCarousel()[0];
+        testSlideActive(0);
+        clock.tick(1100);
+        testSlideActive(1);
+        fireEvent("mouseover", carousel);
+        clock.tick(1100);
+        testSlideActive(1);
+        fireEvent("mouseout", carousel);
+        clock.tick(1100);
+        testSlideActive(2);
+    });
+
+    it('should not pause and play on mouseover when pause is not set to hover', function() {
+        instantiateTemplate({interval: 1000, pause: null});
+        var carousel = getCarousel()[0];
+        testSlideActive(0);
+        clock.tick(1100);
+        testSlideActive(1);
+        fireEvent("mouseover", carousel);
+        clock.tick(1100);
+        testSlideActive(2);
+        fireEvent("mouseout", carousel);
+        clock.tick(1100);
+        testSlideActive(0);
+    });
+
+    it('should remove slide from dom and change active slide', function() {
+        instantiateTemplate({index: 3, nbOfSlides: 4});
+        testSlideActive(3);
+        $set(model, "nbOfSlides", 3);
+        hsp.refresh();
+        testSlideActive(2);
+        $set(model, "nbOfSlides", 5);
+        hsp.refresh();
+        testSlideActive(3);
+        $set(model, "nbOfSlides", 1);
+        hsp.refresh();
+        testSlideActive(0); 
+    });
+
+    it('should not cycle when wrap=false', function() {
+        instantiateTemplate({wrap: false});
+        testSlideActive(0);
+        var carousel = getCarousel()[0];
+        fireEvent(touchEventMap.touchstart, carousel, {clientX : 15, clientY : 0});
+        fireEvent(touchEventMap.touchmove, carousel, {clientX : 5, clientY : 0});
+        fireEvent(touchEventMap.touchend, carousel, {clientX : 0, clientY : 5});
+        hsp.refresh();
+        testSlideActive(0);
+        $set(model, "index", 2);
+        hsp.refresh();
+        testSlideActive(2);
+        fireEvent(touchEventMap.touchstart, carousel, {clientX : 0, clientY : 0});
+        fireEvent(touchEventMap.touchmove, carousel, {clientX : 5, clientY : 0});
+        fireEvent(touchEventMap.touchend, carousel, {clientX : 15, clientY : 5});
+        hsp.refresh();
+        testSlideActive(2);
+         $set(model, "interval", 1000);
+        hsp.refresh();
+        clock.tick(1500);
+        testSlideActive(2);
+        clock.tick(3500);
+        testSlideActive(2);
+    });
+
+    it('should not continue running timers after template is disposed', function() {
+        instantiateTemplate({interval: 1000});
+        sinon.spy(model, "onslideendCB");
+        clock.tick(1500);
+        expect(model.onslideendCB.calledOnce).to.be.ok();
+        clock.tick(1000);
+        expect(model.onslideendCB.calledTwice).to.be.ok();
+        template.$dispose();
+        clock.tick(3500);
+        expect(model.onslideendCB.calledTwice).to.be.ok();
+    });
+
+    it('should raise slide and slid events during each transition', function() {
+        instantiateTemplate({});
+        sinon.spy(model, "onslidestartCB");
+        sinon.spy(model, "onslideendCB");
+        var rightArrow = getRightArrow()[0];
+        expect(model.onslidestartCB.called).not.to.be.ok();
+        expect(model.onslideendCB.called).not.to.be.ok();
+        fireEvent("click", rightArrow);
+        hsp.refresh();
+        expect(model.onslidestartCB.calledOnce).to.be.ok();
+        expect(model.onslideendCB.calledOnce).to.be.ok();
+        fireEvent("click", rightArrow);
+        hsp.refresh();
+        expect(model.onslidestartCB.calledTwice).to.be.ok();
+        expect(model.onslideendCB.calledTwice).to.be.ok();
+        fireEvent("click", rightArrow);
+        hsp.refresh();
+        expect(model.onslidestartCB.calledThrice).to.be.ok();
+        expect(model.onslideendCB.calledThrice).to.be.ok();
+        
+    });
+});

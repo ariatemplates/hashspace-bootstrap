@@ -22,19 +22,22 @@ var _destFolder = "target";
 var _devFolder = _destFolder + "/dev";
 var _prodFolder = _destFolder + "/prod";
 var hspVersion = require('hashspace/package.json').version;
+var noderVersion = require('gulp-noder/node_modules/noder-js/package.json').version;
 var packages = ['hashspace-bootstrap', 'hashspace-bootstrap-demo'];
 
 var karmaCommonConf = {
     browsers: ['Chrome'],
     files: [
         'src/**/*.+(hsp|js)',
-        'test/**/*.spec.js'
+        'test/**/*.spec.*',
+        './node_modules/sinon/pkg/sinon-ie.js'
     ],
-    frameworks: ['mocha', 'chai', 'hsp', 'commonjs'],
+    frameworks: ['mocha', 'expect', 'hsp', 'commonjs', 'sinon'],
     preprocessors: {
         'src/**/*.hsp': ['hsp-compile', 'commonjs'],
         'src/**/*.js': ['hsp-transpile', 'commonjs'],
         'test/**/*.spec.js': ['commonjs'],
+        'test/**/*.spec.hsp': ['hsp-compile', 'commonjs'],
         './node_modules/hashspace/hsp/**/*.js': ['commonjs']
     },
     commonjsPreprocessor: {
@@ -49,7 +52,7 @@ function startWWWServer(folder) {
 
 function html2hsp() {
     return through2.obj(function(file, encoding, done) {
-        var content = "{export template description()}\r\n" + String(file.contents) + "\r\n{/template}";
+        var content = "{export template description()}\r\n" + String(file.contents).replace(/<table>/g, '<table class="table table-bordered">') + "\r\n{/template}";
         file.contents = new Buffer(content);
         file.path = gutil.replaceExtension(file.path, ".hsp");
         this.push(file);
@@ -66,7 +69,7 @@ gulp.task('clean', ['checkstyle'], function(){
 });
 
 gulp.task('build', ['clean'], function() {
-    gulp.src(['demo/**/*.html', 'demo/**/*.css']).pipe(template({version: hspVersion, packages: []})).pipe(gulp.dest(_devFolder));
+    gulp.src(['demo/**/*.html', 'demo/**/*.css']).pipe(template({hspVersion: hspVersion, noderVersion: noderVersion, packages: []})).pipe(gulp.dest(_devFolder));
     gulp.src('demo/**/*.md').pipe(markdown()).pipe(html2hsp()).pipe(hsp.compile()).pipe(gulp.dest(_devFolder + '/demo'));
     gulp.src('demo/**/*.+(hsp|js)').pipe(hsp.process()).pipe(gulp.dest(_devFolder + '/demo'));
     return gulp.src('src/**/*.+(hsp|js)').pipe(hsp.process()).pipe(gulp.dest(_devFolder));
@@ -77,13 +80,13 @@ gulp.task('test', ['checkstyle'], function (done) {
 });
 
 gulp.task('play', ['clean'], function () {
-    watch({glob: ['demo/**/*.html', 'demo/**/*.css']}, function (files) {
-        files.pipe(template({version: hspVersion, packages: []})).pipe(gulp.dest(_devFolder));
+    watch({glob: 'demo/**/*.+(html|css)'}, function (files) {
+        files.pipe(template({hspVersion: hspVersion, noderVersion: noderVersion, packages: []})).pipe(gulp.dest(_devFolder));
     });
     watch({glob: 'demo/**/*.md'}, function (files) {
         files.pipe(markdown().on('error', gutil.log)).pipe(html2hsp()).pipe(hsp.compile()).pipe(gulp.dest(_devFolder + '/demo'));
     });
-    watch({glob: 'demo/**/*.hsp'}, function (files) {
+    watch({glob: 'demo/**/*.+(hsp|js)'}, function (files) {
         files.pipe(hsp.compile().on('error', gutil.log)).pipe(gulp.dest(_devFolder + '/demo'));
     });
     watch({glob: 'src/**/*.+(hsp|js)'}, function (files) {
@@ -99,7 +102,7 @@ gulp.task('tdd', function (done) {
 
 gulp.task('package', ['build'], function() {
     gulp.src(['demo/**/*.html', 'demo/**/*.css'])
-        .pipe(template({version: hspVersion, packages: packages})).pipe(gulp.dest(_prodFolder));
+        .pipe(template({hspVersion: hspVersion, noderVersion: noderVersion, packages: packages})).pipe(gulp.dest(_prodFolder));
 
     gulp.src([_devFolder + '/**/*.+(hsp|js)', '!' + _devFolder+ '/demo/**/*.*'])
         .pipe(noder.package('/' + _devFolder))
