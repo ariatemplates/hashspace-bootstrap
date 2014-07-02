@@ -61,7 +61,7 @@ function html2hsp() {
 }
 
 gulp.task('checkstyle', function() {
-    return gulp.src(['src/**/*.js', 'demo/**/*.js', 'test/**/*.js', 'build/**/*.js']).pipe(jshint()).pipe(jshint.reporter("default")).pipe(jshint.reporter("fail"));
+    return gulp.src(['src/**/*.js', 'demo/**/*.js', 'test/**/*.js', '!demo/lib/**/*.*']).pipe(jshint()).pipe(jshint.reporter("default")).pipe(jshint.reporter("fail"));
 });
 
 gulp.task('clean', ['checkstyle'], function(){
@@ -69,9 +69,10 @@ gulp.task('clean', ['checkstyle'], function(){
 });
 
 gulp.task('build', ['clean'], function() {
-    gulp.src(['demo/**/*.html', 'demo/**/*.css']).pipe(template({hspVersion: hspVersion, noderVersion: noderVersion, packages: []})).pipe(gulp.dest(_devFolder));
-    gulp.src('demo/**/*.md').pipe(markdown()).pipe(html2hsp()).pipe(hsp.compile()).pipe(gulp.dest(_devFolder + '/demo'));
-    gulp.src('demo/**/*.+(hsp|js)').pipe(hsp.process()).pipe(gulp.dest(_devFolder + '/demo'));
+    gulp.src('demo/**/*.+(html)').pipe(template({hspVersion: hspVersion, noderVersion: noderVersion, packages: []})).pipe(gulp.dest(_devFolder));
+    gulp.src('demo/**/*.md').pipe(markdown()).pipe(html2hsp()).pipe(hsp.compile()).pipe(gulp.dest(_devFolder));
+    gulp.src('demo/samples/**/*.+(hsp|js)').pipe(hsp.process()).pipe(gulp.dest(_devFolder + '/samples'));
+    gulp.src('demo/+(css|lib)/**/*.*').pipe(gulp.dest(_devFolder));
     return gulp.src('src/**/*.+(hsp|js)').pipe(hsp.process()).pipe(gulp.dest(_devFolder));
 });
 
@@ -80,14 +81,17 @@ gulp.task('test', ['checkstyle'], function (done) {
 });
 
 gulp.task('play', ['clean'], function () {
-    watch({glob: 'demo/**/*.+(html|css)'}, function (files) {
+    watch({glob: 'demo/**/*.+(html)'}, function (files) {
         files.pipe(template({hspVersion: hspVersion, noderVersion: noderVersion, packages: []})).pipe(gulp.dest(_devFolder));
     });
     watch({glob: 'demo/**/*.md'}, function (files) {
-        files.pipe(markdown().on('error', gutil.log)).pipe(html2hsp()).pipe(hsp.compile()).pipe(gulp.dest(_devFolder + '/demo'));
+        files.pipe(markdown().on('error', gutil.log)).pipe(html2hsp()).pipe(hsp.compile()).pipe(gulp.dest(_devFolder ));
     });
-    watch({glob: 'demo/**/*.+(hsp|js)'}, function (files) {
-        files.pipe(hsp.compile().on('error', gutil.log)).pipe(gulp.dest(_devFolder + '/demo'));
+    watch({glob: 'demo/samples/**/*.+(hsp|js)'}, function (files) {
+        files.pipe(hsp.compile().on('error', gutil.log)).pipe(gulp.dest(_devFolder + '/samples'));
+    });
+    watch({glob: 'demo/+(css|lib)/**/*.*'}, function (files) {
+        files.pipe(gulp.dest(_devFolder));
     });
     watch({glob: 'src/**/*.+(hsp|js)'}, function (files) {
         files.pipe(hsp.process().on('error', gutil.log)).pipe(gulp.dest(_devFolder));
@@ -101,17 +105,20 @@ gulp.task('tdd', function (done) {
 });
 
 gulp.task('package', ['build'], function() {
-    gulp.src(['demo/**/*.html', 'demo/**/*.css'])
+    gulp.src(['demo/**/*.+(html)'])
         .pipe(template({hspVersion: hspVersion, noderVersion: noderVersion, packages: packages})).pipe(gulp.dest(_prodFolder));
+    gulp.src('demo/+(css|lib)/**/*.*').pipe(gulp.dest(_prodFolder));
 
-    gulp.src([_devFolder + '/**/*.+(hsp|js)', '!' + _devFolder+ '/demo/**/*.*'])
+    gulp.src([_devFolder + '/**/*.+(hsp|js)', '!' + _devFolder+ '/samples/**/*.*', '!' + _devFolder+ '/lib/**/*.*'])
         .pipe(noder.package('/' + _devFolder))
         .pipe(concat('hashspace-bootstrap.js')).pipe(noder.wrap())
-        .pipe(uglify()).pipe(gulp.dest(_prodFolder));
-    gulp.src(_devFolder + '/demo/**/*.+(hsp|js)')
+        .pipe(uglify())
+        .pipe(gulp.dest(_prodFolder));
+    gulp.src([_devFolder + '/samples/**/*.+(hsp|js)'])
         .pipe(noder.package('/' + _devFolder))
         .pipe(concat('hashspace-bootstrap-demo.js')).pipe(noder.wrap())
-        .pipe(uglify()).pipe(gulp.dest(_prodFolder));
+        .pipe(uglify())
+        .pipe(gulp.dest(_prodFolder));
 });
 
 gulp.task('www', ['package'], function() {

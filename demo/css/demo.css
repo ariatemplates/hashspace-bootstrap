@@ -1,0 +1,27 @@
+body {
+  padding-top: 50px;
+}
+
+.navbar-inverse {
+    background-color: #4b8ab5;
+    border-color: #4b8ab5;
+}
+
+.navbar-inverse .navbar-brand,  .navbar-inverse .navbar-nav>li>a {
+    color: #ffffff;
+}
+.navbar-inverse .navbar-brand:hover,  .navbar-inverse .navbar-nav>li>a:hover {
+    color: #bed63a;
+}
+
+h1 {
+    color: #bfd730;
+}
+h2, h3, h4, h5, 6 {
+    color: #5092bd;
+}
+
+.content {
+  padding: 40px 15px;
+}
+
