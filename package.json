@@ -28,6 +28,7 @@
     "karma-commonjs": "~0.0.9",
     "karma-hashspace": "~0.0.2",
     "karma-sinon": "~1.0.3",
+    "karma-sauce-launcher": "~0.2.9",
     "expect.js": "~0.3.1",
     "karma-expect": "~1.1.0",
     "lodash": "~2.4.1"
