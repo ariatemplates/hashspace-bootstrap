@@ -16,6 +16,7 @@ var karma = require('karma').server;
 var connect = require('connect');
 var _ = require('lodash');
 var through2 = require('through2');
+var karmaConf = require('./build/karma.conf');
 
 var wwwServerPort = 8080;
 var _destFolder = "target";
@@ -24,27 +25,6 @@ var _prodFolder = _destFolder + "/prod";
 var hspVersion = require('hashspace/package.json').version;
 var noderVersion = require('gulp-noder/node_modules/noder-js/package.json').version;
 var packages = ['hashspace-bootstrap', 'hashspace-bootstrap-demo'];
-
-var karmaCommonConf = {
-    reporters: ['dots'],
-    browsers: ['Firefox'],
-    files: [
-        'src/**/*.+(hsp|js)',
-        'test/**/*.spec.*',
-        './node_modules/sinon/pkg/sinon-ie.js'
-    ],
-    frameworks: ['mocha', 'expect', 'hsp', 'commonjs', 'sinon'],
-    preprocessors: {
-        'src/**/*.hsp': ['hsp-compile', 'commonjs'],
-        'src/**/*.js': ['hsp-transpile', 'commonjs'],
-        'test/**/*.spec.js': ['commonjs'],
-        'test/**/*.spec.hsp': ['hsp-compile', 'commonjs'],
-        './node_modules/hashspace/hsp/**/*.js': ['commonjs']
-    },
-    commonjsPreprocessor: {
-        modulesRoot: './node_modules/hashspace'
-    }
-};
 
 function startWWWServer(folder) {
     gutil.log('Starting WWW server at http://localhost:' + wwwServerPort);
@@ -78,7 +58,7 @@ gulp.task('build', ['clean'], function() {
 });
 
 gulp.task('test', ['checkstyle'], function (done) {
-    return karma.start(_.assign({}, karmaCommonConf, {singleRun: true}), done);
+    karma.start(_.assign({}, karmaConf.common, karmaConf.test), done);
 });
 
 gulp.task('play', ['clean'], function () {
@@ -102,7 +82,7 @@ gulp.task('play', ['clean'], function () {
 });
 
 gulp.task('tdd', function (done) {
-    karma.start(_.assign({}, karmaCommonConf), done);
+    karma.start(_.assign({}, karmaConf.common), done);
 });
 
 gulp.task('package', ['build'], function() {
@@ -126,6 +106,19 @@ gulp.task('www', ['package'], function() {
     startWWWServer(_prodFolder);
 });
 
-gulp.task('ci', ['test']);
+gulp.task('ci1', ['checkstyle'], function (done) {
+    karma.start(_.assign({}, karmaConf.common, karmaConf.ci1), done);
+});
+gulp.task('ci2', ['ci1'], function (done) {
+    karma.start(_.assign({}, karmaConf.common, karmaConf.ci2), done);
+});
+gulp.task('ci', ['ci2', 'test'], function () {
+    //TODO: remove process.exit() here
+    process.exit();
+});
+
+gulp.task('sauce', ['checkstyle'], function (done) {
+    return karma.start(_.assign({}, karmaConf.common, karmaConf.sauce), done);
+});
 
 gulp.task('default', ['package']);
