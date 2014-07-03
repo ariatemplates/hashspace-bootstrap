@@ -26,7 +26,8 @@ var noderVersion = require('gulp-noder/node_modules/noder-js/package.json').vers
 var packages = ['hashspace-bootstrap', 'hashspace-bootstrap-demo'];
 
 var karmaCommonConf = {
-    browsers: ['Chrome'],
+    reporters: ['dots'],
+    browsers: ['Firefox'],
     files: [
         'src/**/*.+(hsp|js)',
         'test/**/*.spec.*',
@@ -124,5 +125,7 @@ gulp.task('package', ['build'], function() {
 gulp.task('www', ['package'], function() {
     startWWWServer(_prodFolder);
 });
+
+gulp.task('ci', ['test']);
 
 gulp.task('default', ['package']);
