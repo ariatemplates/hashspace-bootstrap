@@ -1,11 +1,29 @@
 [![Build Status](https://secure.travis-ci.org/ariatemplates/hashspace-bootstrap.png)](http://travis-ci.org/ariatemplates/hashspace-bootstrap)
+[![devDependency Status](https://david-dm.org/ariatemplates/hashspace-bootstrap/dev-status.png)](https://david-dm.org/ariatemplates/hashspace-bootstrap#info=devDependencies)
 [![Coverage Status](https://coveralls.io/repos/ariatemplates/hashspace-bootstrap/badge.png?branch=master)](https://coveralls.io/r/ariatemplates/hashspace-bootstrap?branch=master)
 [![Selenium Test Status](https://saucelabs.com/browser-matrix/hashspace-bootstrap.svg)](https://saucelabs.com/u/hashspace-bootstrap)
 
-hashspace-bootstrap
-===================
+!!! Work in progress !!!
+========================
 
-Hashspace components for Bootstrap
+Hashspace components for Bootstrap.  
+
+Already implemented:
+ - Carousel
+
+To be implemented:
+ - Modal
+ - Dropdown
+ - ScrollSpy
+ - Togglable tabs
+ - Tooltips
+ - Popovers
+ - Alert messages
+ - Buttons
+ - Collapse
+ - Affix
+ - Autocomplete
+ - Date picker
 
 ## Development
 
@@ -14,7 +32,7 @@ Hashspace components for Bootstrap
 - install Gulp  globally: `npm install -g gulp`
 - install local npm modules: `npm install`
 
-### Running Tests
+### Running scripts
 
 For jshint validation:
 
