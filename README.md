@@ -1,4 +1,5 @@
 [![Build Status](https://secure.travis-ci.org/ariatemplates/hashspace-bootstrap.png)](http://travis-ci.org/ariatemplates/hashspace-bootstrap)
+[![Coverage Status](https://coveralls.io/repos/ariatemplates/hashspace-bootstrap/badge.png?branch=master)](https://coveralls.io/r/ariatemplates/hashspace-bootstrap?branch=master)
 [![Selenium Test Status](https://saucelabs.com/browser-matrix/hashspace-bootstrap.svg)](https://saucelabs.com/u/hashspace-bootstrap)
 
 hashspace-bootstrap

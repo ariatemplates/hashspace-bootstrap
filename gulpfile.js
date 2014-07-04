@@ -106,13 +106,13 @@ gulp.task('www', ['package'], function() {
     startWWWServer(_prodFolder);
 });
 
-gulp.task('ci1', ['checkstyle'], function (done) {
+gulp.task('ci1', ['test'], function (done) {
     karma.start(_.assign({}, karmaConf.common, karmaConf.ci1), done);
 });
 gulp.task('ci2', ['ci1'], function (done) {
     karma.start(_.assign({}, karmaConf.common, karmaConf.ci2), done);
 });
-gulp.task('ci', ['ci2', 'test'], function () {
+gulp.task('ci', ['ci2'], function () {
     //TODO: remove process.exit() here
     process.exit();
 });
