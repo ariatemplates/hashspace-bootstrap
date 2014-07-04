@@ -1,3 +1,13 @@
+var preprocessors = {
+    'src/**/*.hsp': ['hsp-compile', 'commonjs'],
+    'src/**/*.js': ['hsp-transpile', 'commonjs'],
+    'test/**/*.spec.js': ['commonjs'],
+    'test/**/*.spec.hsp': ['hsp-compile', 'commonjs'],
+    './node_modules/hashspace/hsp/**/*.js': ['commonjs']
+};
+var coveragePreprocessors = JSON.parse(JSON.stringify(preprocessors));
+coveragePreprocessors['src/**/*.js'].push('coverage');
+
 exports.common = {
     reporters: ['dots'],
     browsers: ['Firefox'],
@@ -7,13 +17,7 @@ exports.common = {
         './node_modules/sinon/pkg/sinon-ie.js'
     ],
     frameworks: ['mocha', 'expect', 'hsp', 'commonjs', 'sinon'],
-    preprocessors: {
-        'src/**/*.hsp': ['hsp-compile', 'commonjs'],
-        'src/**/*.js': ['hsp-transpile', 'commonjs'],
-        'test/**/*.spec.js': ['commonjs'],
-        'test/**/*.spec.hsp': ['hsp-compile', 'commonjs'],
-        './node_modules/hashspace/hsp/**/*.js': ['commonjs']
-    },
+    preprocessors: preprocessors,
     commonjsPreprocessor: {
         modulesRoot: './node_modules/hashspace'
     },
@@ -112,7 +116,14 @@ exports.common = {
 };
 
 exports.test = {
-    singleRun: true
+    singleRun: true,
+    preprocessors: coveragePreprocessors,
+    reporters: ['dots', 'coverage'],
+    browsers: ['Firefox'],
+    coverageReporter: {
+      type : 'lcovonly',
+      dir : 'test-results/karma/'
+    }
 };
 
 exports.ci1 = {

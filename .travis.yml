@@ -9,6 +9,10 @@ env:
     - BROWSER_PROVIDER_READY_FILE=/tmp/sauce-connect-ready
     - LOGS_DIR=/tmp/logs
 
+before_install:
+ - npm install --quiet -g gulp
+ - npm install -g coveralls@2.8.0 &> install-coveralls.log
+
 before_script:
  - mkdir -p $LOGS_DIR
  - chmod -R 777 ./build/sauce/connect_start.sh
@@ -18,11 +22,11 @@ before_script:
  - chmod -R 777 ./build/sauce/connect_wait.sh
  - ./build/sauce/connect_wait.sh
 
-before_install:
- - npm install --quiet -g gulp
-
 script:
  - gulp ci
+
+after_success:
+ - cat test-results/*/*/*.info | coveralls && echo "Successfully sent coverage to https://coveralls.io"
 
 after_failure:
  - chmod -R 777 ./build/sauce/connect_logs.sh
