@@ -1,4 +1,5 @@
 [![Build Status](https://secure.travis-ci.org/ariatemplates/hashspace-bootstrap.png)](http://travis-ci.org/ariatemplates/hashspace-bootstrap)
+[![Dependency Status](https://david-dm.org/ariatemplates/hashspace-bootstrap.svg)](https://david-dm.org/ariatemplates/hashspace-bootstrap)
 [![devDependency Status](https://david-dm.org/ariatemplates/hashspace-bootstrap/dev-status.png)](https://david-dm.org/ariatemplates/hashspace-bootstrap#info=devDependencies)
 [![Coverage Status](https://coveralls.io/repos/ariatemplates/hashspace-bootstrap/badge.png?branch=master)](https://coveralls.io/r/ariatemplates/hashspace-bootstrap?branch=master)
 [![Selenium Test Status](https://saucelabs.com/browser-matrix/hashspace-bootstrap.svg)](https://saucelabs.com/u/hashspace-bootstrap)

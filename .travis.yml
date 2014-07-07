@@ -8,6 +8,7 @@ env:
     - SAUCE_ACCESS_KEY=5bc971c0-02c9-4091-91ab-937f2b0eb52c
     - BROWSER_PROVIDER_READY_FILE=/tmp/sauce-connect-ready
     - LOGS_DIR=/tmp/logs
+    - secure: CsAmcdEpDJHEw/BEmg4f9zGAfeNY9I21UHXqKpcsWMGK8MXQWbF6f4t5CIrmg4Vn/mM7BXFINifDE/Q1+owbiun8XzLshmy9lCtGBAuuZaPH7CHAlO2wZEy/3015VIoJqsXGZ8cMPeFKElNnUNJJHr7ZSihHCv4sazsE/qifzgc=
 
 before_install:
  - npm install --quiet -g gulp
@@ -27,6 +28,8 @@ script:
 
 after_success:
  - cat test-results/*/*/*.info | coveralls && echo "Successfully sent coverage to https://coveralls.io"
+ - chmod -R 777 ./ci-release.sh
+ - ./ci-release.sh
 
 after_failure:
  - chmod -R 777 ./build/sauce/connect_logs.sh

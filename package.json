@@ -8,9 +8,10 @@
     "url": "https://github.com/ariatemplates/hashspace-bootstrap"
   },
   "homepage": "http://ariatemplates.github.io/hashspace-bootstrap/",
-  "dependencies": {},
+  "dependencies": {
+    "gulp": "~3.8.1"
+  },
   "devDependencies": {
-    "gulp": "~3.8.1",
     "gulp-util": "~2.2.17",
     "gulp-watch": "~0.6.8",
     "gulp-template": "~0.1.1",
