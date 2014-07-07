@@ -46,7 +46,8 @@ gulp.task('checkstyle', function() {
 });
 
 gulp.task('clean', ['checkstyle'], function(){
-    return gulp.src(_destFolder, {read: false}).pipe(clean());
+    gulp.src(_devFolder + '**/*', {read: false}).pipe(clean());
+    return gulp.src(_prodFolder + '**/*', {read: false}).pipe(clean());
 });
 
 gulp.task('build', ['clean'], function() {
