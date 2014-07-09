@@ -11,6 +11,7 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var jshint = require('gulp-jshint');
 var noder = require('gulp-noder');
+var rename = require('gulp-rename');
 var http = require('http');
 var karma = require('karma').server;
 var connect = require('connect');
@@ -24,7 +25,7 @@ var _devFolder = _destFolder + "/dev";
 var _prodFolder = _destFolder + "/prod";
 var hspVersion = require('hashspace/package.json').version;
 var noderVersion = require('gulp-noder/node_modules/noder-js/package.json').version;
-var packages = ['hashspace-bootstrap', 'hashspace-bootstrap-demo'];
+var packages = ['hashspace-bootstrap-noder.min', 'demo-hashspace-bootstrap-noder.min'];
 
 function startWWWServer(folder) {
     gutil.log('Starting WWW server at http://localhost:' + wwwServerPort);
@@ -51,11 +52,11 @@ gulp.task('clean', ['checkstyle'], function(){
 });
 
 gulp.task('build', ['clean'], function() {
+    gulp.src('src/**/*.+(hsp|js)').pipe(hsp.process()).pipe(gulp.dest(_devFolder));
     gulp.src('demo/**/*.+(html)').pipe(template({hspVersion: hspVersion, noderVersion: noderVersion, packages: []})).pipe(gulp.dest(_devFolder));
     gulp.src('demo/**/*.md').pipe(markdown()).pipe(html2hsp()).pipe(hsp.compile()).pipe(gulp.dest(_devFolder));
-    gulp.src('demo/samples/**/*.+(hsp|js)').pipe(hsp.process()).pipe(gulp.dest(_devFolder + '/samples'));
     gulp.src('demo/+(css|lib)/**/*.*').pipe(gulp.dest(_devFolder));
-    return gulp.src('src/**/*.+(hsp|js)').pipe(hsp.process()).pipe(gulp.dest(_devFolder));
+    return gulp.src('demo/samples/**/*.+(hsp|js)').pipe(hsp.process()).pipe(gulp.dest(_devFolder + '/samples'));
 });
 
 gulp.task('test', ['checkstyle'], function (done) {
@@ -93,13 +94,17 @@ gulp.task('package', ['build'], function() {
 
     gulp.src([_devFolder + '/**/*.+(hsp|js)', '!' + _devFolder+ '/samples/**/*.*', '!' + _devFolder+ '/lib/**/*.*'])
         .pipe(noder.package('/' + _devFolder))
-        .pipe(concat('hashspace-bootstrap.js')).pipe(noder.wrap())
+        .pipe(concat('hashspace-bootstrap-noder.js')).pipe(noder.wrap())
+        .pipe(gulp.dest(_prodFolder))
         .pipe(uglify())
+        .pipe(rename('hashspace-bootstrap-noder.min.js'))
         .pipe(gulp.dest(_prodFolder));
     gulp.src([_devFolder + '/samples/**/*.+(hsp|js)'])
         .pipe(noder.package('/' + _devFolder))
-        .pipe(concat('hashspace-bootstrap-demo.js')).pipe(noder.wrap())
+        .pipe(concat('demo-hashspace-bootstrap-noder.js')).pipe(noder.wrap())
+        .pipe(gulp.dest(_prodFolder))
         .pipe(uglify())
+        .pipe(rename('demo-hashspace-bootstrap-noder.min.js'))
         .pipe(gulp.dest(_prodFolder));
 });
 
