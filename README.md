@@ -46,7 +46,7 @@ To run the tests:
 To use the project in **dev** mode:
 
 - run `gulp build` to build it
-- run `gulp play` to build it and start a webserver which watches source files at http://localhost:8080
+- run `gulp play` to build it and start a webserver which watches source files at http://localhost:8080 and uses [livereload](http://livereload.com/) in Chrome
 - run `gulp play tdd` to work in the TDD mode (i.e. watch source files to build and run all tests)
 
 To use the project in **production** mode:
