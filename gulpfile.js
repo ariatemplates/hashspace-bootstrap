@@ -6,12 +6,13 @@ var watch = require('gulp-watch');
 var template = require('gulp-template');
 var markdown = require('gulp-markdown');
 var hsp = require('gulp-hashspace');
-var clean = require('gulp-clean');
+var rimraf = require('rimraf');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var jshint = require('gulp-jshint');
 var noder = require('gulp-noder');
 var rename = require('gulp-rename');
+var livereload = require('gulp-livereload');
 var http = require('http');
 var karma = require('karma').server;
 var connect = require('connect');
@@ -46,9 +47,8 @@ gulp.task('checkstyle', function() {
     return gulp.src(['src/**/*.js', 'demo/**/*.js', 'test/**/*.js', '!demo/lib/**/*.*']).pipe(jshint()).pipe(jshint.reporter("default")).pipe(jshint.reporter("fail"));
 });
 
-gulp.task('clean', ['checkstyle'], function(){
-    gulp.src(_devFolder + '**/*', {read: false}).pipe(clean());
-    return gulp.src(_prodFolder + '**/*', {read: false}).pipe(clean());
+gulp.task('clean', function (done) {
+    rimraf(_destFolder, done);
 });
 
 gulp.task('build', ['clean'], function() {
@@ -63,7 +63,7 @@ gulp.task('test', ['checkstyle'], function (done) {
     karma.start(_.assign({}, karmaConf.common, karmaConf.test), done);
 });
 
-gulp.task('play', ['clean'], function () {
+gulp.task('play', ['build'], function () {
     watch({glob: 'demo/**/*.+(html)'}, function (files) {
         files.pipe(template({hspVersion: hspVersion, noderVersion: noderVersion, packages: []})).pipe(gulp.dest(_devFolder));
     });
@@ -80,7 +80,10 @@ gulp.task('play', ['clean'], function () {
         files.pipe(hsp.process().on('error', gutil.log)).pipe(gulp.dest(_devFolder));
     });
 
-    startWWWServer(_devFolder);
+    livereload.listen();
+    gulp.watch(_devFolder + '/**').on('change', livereload.changed).on('error', function(e){console.log(e);});
+
+    return startWWWServer(_devFolder);
 });
 
 gulp.task('tdd', function (done) {
