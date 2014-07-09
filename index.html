@@ -1,1 +1,34 @@
-gh-pages
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="./css/demo.css">
+        <title>Hashspace - Bootstrap</title>
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+            <link href="//netdna.bootstrapcdn.com/respond-proxy.html" id="respond-proxy" rel="respond-proxy">
+            <link href="/demo/lib/respondjs/respond.proxy.gif" id="respond-redirect" rel="respond-redirect">
+            <script src="/demo/lib/respondjs/respond.proxy.js"></script>
+        <![endif]-->
+        <script src="http://noder-js.ariatemplates.com/dist/v1.5.0/noder.min.js" type="text/javascript">
+        {
+            packaging: {
+                baseUrl: "/"
+            }
+        }
+        </script>
+        <script src="http://hashspace.ariatemplates.com/dist/0.0.4/hashspace-noder.min.js" type="text/javascript"></script>
+        <script src="./hashspace-bootstrap.js" type="text/javascript"></script><script src="./hashspace-bootstrap-demo.js" type="text/javascript"></script>
+        <script type="application/x-noder">
+            var index = require('./samples/index.hsp').index;
+            index().render(document.body);
+        </script>
+
+    </head>
+    <body>
+    </body>
+</html>
