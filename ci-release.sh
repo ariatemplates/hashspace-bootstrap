@@ -12,11 +12,11 @@ if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_SECURE_ENV_VARS" = "true" 
     # we execute the release task
     cd ../.. &&
     gulp package &&
-    # we copy the packaged app into the right folder
-    # mkdir -p "./dist/${PACKAGE_VERSION}" &&
-    # cp -rv ../dist/* "./dist/${PACKAGE_VERSION}/" &&
-    # we add everything
     cd target/prod &&
+    # we copy the packaged app into the right folder
+    mkdir -p "./dist/${PACKAGE_VERSION}" &&
+    cp -rv ./hashspace* "./dist/${PACKAGE_VERSION}/" &&
+    # we add everything
     git add -f . &&
     # we let git check for deleted files
     git add -u &&
