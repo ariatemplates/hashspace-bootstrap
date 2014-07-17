@@ -30,7 +30,7 @@ var CarouselController = require("./carousel").CarouselController;
                 <span class="glyphicon glyphicon-chevron-left"></span>
             </a>
         {/if}
-        {if ctrl.content.length > 1 && !(!ctrl.wrap && ctrl.internalIndex === (ctrl.content.length - 1))}
+        {if ctrl.hasNext()}
             <a class="right carousel-control" onclick="{ctrl.next()}">
                 <span class="glyphicon glyphicon-chevron-right"></span>
             </a>

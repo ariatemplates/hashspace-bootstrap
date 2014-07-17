@@ -113,10 +113,13 @@ exports.CarouselController = new klass({
         if (this.isTransitioning) {
             this.queue = {action: "next"};
         }
-        else if (!(!this.wrap && this.internalIndex === (this._getNumberOfSlides() - 1))) {
+        else if (this.hasNext()) {
             var nextIndex = (this.internalIndex + 1) % this._getNumberOfSlides();
             this._navigateTo(nextIndex, true);
         }
+    },
+    hasNext: function() {
+        return this._getNumberOfSlides() > 1 && !(!this.wrap && this.internalIndex === (this._getNumberOfSlides() - 1));
     },
     navigate: function(index) {
         if (this.isTransitioning) {
