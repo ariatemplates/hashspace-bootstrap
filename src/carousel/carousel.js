@@ -104,7 +104,7 @@ exports.CarouselController = new klass({
         if (this.isTransitioning) {
             this.queue = {action: "prev"};
         }
-        else if (!(!this.wrap && this.internalIndex === 0)) {
+        else if (this.hasPrev()) {
             var nextIndex = this.internalIndex - 1 < 0 ? this._getNumberOfSlides() - 1 : this.internalIndex - 1;
             this._navigateTo(nextIndex, false);
         }
@@ -117,6 +117,9 @@ exports.CarouselController = new klass({
             var nextIndex = (this.internalIndex + 1) % this._getNumberOfSlides();
             this._navigateTo(nextIndex, true);
         }
+    },
+    hasPrev: function() {
+        return this._getNumberOfSlides() > 1 &&  !(!this.wrap && this.internalIndex === 0);
     },
     navigate: function(index) {
         if (this.isTransitioning) {

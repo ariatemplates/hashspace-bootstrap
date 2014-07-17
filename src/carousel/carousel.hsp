@@ -25,7 +25,7 @@ var CarouselController = require("./carousel").CarouselController;
                 </div>
             {/foreach}
         </div>
-        {if ctrl.content.length > 1 &&  !(!ctrl.wrap && ctrl.internalIndex === 0)}
+        {if ctrl.hasPrev()}
             <a class="left carousel-control" onclick="{ctrl.prev()}">
                 <span class="glyphicon glyphicon-chevron-left"></span>
             </a>
