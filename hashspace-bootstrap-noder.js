@@ -11,7 +11,7 @@ var CarouselController = require("./carousel").CarouselController;
 
 
 var carousel =$set(exports, "carousel", require("hsp/rt").template({ctl:[CarouselController,"CarouselController"],ref:"ctrl"}, function(n){
-  return [n.elt("div",{e1:[3,2,"ctrl","toggleOnHover"],e2:[3,2,"ctrl","toggleOnHover"],e3:[3,2,"ctrl","handleSwipe",1,4],e4:[0,1,"event"]},{"class":"carousel slide"},{"mouseover":1,"mouseout":2,"swipe":3},[n.$if({e1:[6,function(a0) {return (a0 > 1);},2],e2:[1,3,"ctrl","content","length"]},1,[n.elt("ol",0,{"class":"carousel-indicators"},0,[n.$foreach({e1:[1,2,"ctrl","content"]},"idx","slide",0,1,[n.elt("li",{e1:[6,function(a0,a1) {return (((a0 === a1))? ''+"active":'');},2,3],e2:[1,1,"idx"],e3:[1,2,"ctrl","internalIndex"],e4:[3,2,"ctrl","navigate",1,5],e5:[1,1,"idx"]},{"class":["",1]},{"click":4})]),n.$text(0,[" "])])]),n.elt("div",0,{"class":"carousel-inner"},0,[n.$foreach({e1:[1,2,"ctrl","content"]},"idx","slide",0,1,[n.elt("div",{e1:[6,function(a0,a1,a2,a3,a4) {return ["item",(((a0 === a1))? ''+"active":''),((((a0 === a2) && (a3 === "prev")))? ''+"prev":''),((((a0 === a2) && (a3 === "next")))? ''+"next":''),(((((a0 === a1) || (a0 === a2)) && (a4 === "left")))? ''+"left":''),(((((a0 === a1) || (a0 === a2)) && (a4 === "right")))? ''+"right":'')].join(' ');},2,3,4,5,6],e2:[1,1,"idx"],e3:[1,2,"ctrl","internalIndex"],e4:[1,2,"ctrl","nextIndex"],e5:[1,2,"ctrl","ongoingNavigation"],e6:[1,2,"ctrl","navigationDirection"]},{"class":["",1]},0,[n.cpt([null,"slide","body"],0,0,0),n.$if({e1:[1,2,"slide","caption"]},1,[n.elt("div",0,{"class":"carousel-caption"},0,[n.cpt([null,"slide","caption"],0,0,0)])])])]),n.$text(0,[" "])]),n.$if({e1:[6,function(a0,a1,a2) {return ((a0 > 1) && !((!(a1) && (a2 === 0))));},2,3,4],e2:[1,3,"ctrl","content","length"],e3:[1,2,"ctrl","wrap"],e4:[1,2,"ctrl","internalIndex"]},1,[n.elt("a",{e1:[3,2,"ctrl","prev"]},{"class":"left carousel-control"},{"click":1},[n.elt("span",0,{"class":"glyphicon glyphicon-chevron-left"},0)])]),n.$if({e1:[6,function(a0,a1,a2) {return ((a0 > 1) && !((!(a1) && (a2 === (a0 - 1)))));},2,3,4],e2:[1,3,"ctrl","content","length"],e3:[1,2,"ctrl","wrap"],e4:[1,2,"ctrl","internalIndex"]},1,[n.elt("a",{e1:[3,2,"ctrl","next"]},{"class":"right carousel-control"},{"click":1},[n.elt("span",0,{"class":"glyphicon glyphicon-chevron-right"},0)])])])];
+  return [n.elt("div",{e1:[3,2,"ctrl","toggleOnHover"],e2:[3,2,"ctrl","toggleOnHover"],e3:[3,2,"ctrl","handleSwipe",1,4],e4:[0,1,"event"]},{"class":"carousel slide"},{"mouseover":1,"mouseout":2,"swipe":3},[n.$if({e1:[6,function(a0) {return (a0 > 1);},2],e2:[1,3,"ctrl","content","length"]},1,[n.elt("ol",0,{"class":"carousel-indicators"},0,[n.$foreach({e1:[1,2,"ctrl","content"]},"idx","slide",0,1,[n.elt("li",{e1:[6,function(a0,a1) {return (((a0 === a1))? ''+"active":'');},2,3],e2:[1,1,"idx"],e3:[1,2,"ctrl","internalIndex"],e4:[3,2,"ctrl","navigate",1,5],e5:[1,1,"idx"]},{"class":["",1]},{"click":4})]),n.$text(0,[" "])])]),n.elt("div",0,{"class":"carousel-inner"},0,[n.$foreach({e1:[1,2,"ctrl","content"]},"idx","slide",0,1,[n.elt("div",{e1:[6,function(a0,a1,a2,a3,a4) {return ["item",(((a0 === a1))? ''+"active":''),((((a0 === a2) && (a3 === "prev")))? ''+"prev":''),((((a0 === a2) && (a3 === "next")))? ''+"next":''),(((((a0 === a1) || (a0 === a2)) && (a4 === "left")))? ''+"left":''),(((((a0 === a1) || (a0 === a2)) && (a4 === "right")))? ''+"right":'')].join(' ');},2,3,4,5,6],e2:[1,1,"idx"],e3:[1,2,"ctrl","internalIndex"],e4:[1,2,"ctrl","nextIndex"],e5:[1,2,"ctrl","ongoingNavigation"],e6:[1,2,"ctrl","navigationDirection"]},{"class":["",1]},0,[n.cpt([null,"slide","body"],0,0,0),n.$if({e1:[1,2,"slide","caption"]},1,[n.elt("div",0,{"class":"carousel-caption"},0,[n.cpt([null,"slide","caption"],0,0,0)])])])]),n.$text(0,[" "])]),n.$if({e1:[3,2,"ctrl","hasPrev"]},1,[n.elt("a",{e1:[3,2,"ctrl","prev"]},{"class":"left carousel-control"},{"click":1},[n.elt("span",0,{"class":"glyphicon glyphicon-chevron-left"},0)])]),n.$if({e1:[3,2,"ctrl","hasNext"]},1,[n.elt("a",{e1:[3,2,"ctrl","next"]},{"class":"right carousel-control"},{"click":1},[n.elt("span",0,{"class":"glyphicon glyphicon-chevron-right"},0)])])])];
 }));
 
 });
@@ -124,7 +124,7 @@ $set(exports, "CarouselController", new klass({
         if (this.isTransitioning) {
             $set(this, "queue", {action: "prev"});
         }
-        else if (!(!this.wrap && this.internalIndex === 0)) {
+        else if (this.hasPrev()) {
             var nextIndex = this.internalIndex - 1 < 0 ? this._getNumberOfSlides() - 1 : this.internalIndex - 1;
             this._navigateTo(nextIndex, false);
         }
@@ -133,10 +133,16 @@ $set(exports, "CarouselController", new klass({
         if (this.isTransitioning) {
             $set(this, "queue", {action: "next"});
         }
-        else if (!(!this.wrap && this.internalIndex === (this._getNumberOfSlides() - 1))) {
+        else if (this.hasNext()) {
             var nextIndex = (this.internalIndex + 1) % this._getNumberOfSlides();
             this._navigateTo(nextIndex, true);
         }
+    },
+    hasPrev: function() {
+        return this._getNumberOfSlides() > 1 &&  !(!this.wrap && this.internalIndex === 0);
+    },
+    hasNext: function() {
+        return this._getNumberOfSlides() > 1 && !(!this.wrap && this.internalIndex === (this._getNumberOfSlides() - 1));
     },
     navigate: function(index) {
         if (this.isTransitioning) {
