@@ -8,7 +8,7 @@ env:
     - SAUCE_ACCESS_KEY=5bc971c0-02c9-4091-91ab-937f2b0eb52c
     - BROWSER_PROVIDER_READY_FILE=/tmp/sauce-connect-ready
     - LOGS_DIR=/tmp/logs
-    - secure: CsAmcdEpDJHEw/BEmg4f9zGAfeNY9I21UHXqKpcsWMGK8MXQWbF6f4t5CIrmg4Vn/mM7BXFINifDE/Q1+owbiun8XzLshmy9lCtGBAuuZaPH7CHAlO2wZEy/3015VIoJqsXGZ8cMPeFKElNnUNJJHr7ZSihHCv4sazsE/qifzgc=
+    - secure: QXHix+y1skNkXhAaNj9EE9cd5GyhFcF7/YyxIKEyfwdIuvEWKswuJ5Q9iyGTROP2foGQ2uz4Otz4JYTF/IVAQrgjz0uSkyyEj1eargvcUh2p6SV9x3AH9AeIR9zTeGU/Iegk6g1UUNQTpt10vI6OrXCh7VXic+BpgcVga+ocLYY=
 
 before_install:
  - npm install --quiet -g gulp
