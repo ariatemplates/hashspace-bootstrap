@@ -341,4 +341,30 @@ describe('Carousel', function() {
         expect(model.onslideendCB.calledThrice).to.be.ok();
         
     });
+
+    it('should transition', function(done) {
+        clock.restore();
+        container = window.document.body;
+        var cssCode = ".carousel-inner > .item{position:relative;display:none;-webkit-transition:10ms ease-in-out left;transition:10ms ease-in-out left;}.carousel-inner > .active,.carousel-inner > .next,.carousel-inner > .prev{display:block;}.carousel-inner > .next,.carousel-inner > .prev{position:absolute;top:0;width:100%;}.carousel-inner > .active,.carousel-inner > .next.left,.carousel-inner > .prev.right{left:0;}.carousel-inner > .next,.carousel-inner > .active.right{left:100%;}.carousel-inner > .prev,.carousel-inner > .active.left{left:-100%;}";
+        var styleElement = document.createElement("style");
+        styleElement.type = "text/css";
+        if (styleElement.styleSheet) {
+            styleElement.styleSheet.cssText = cssCode;
+        } else {
+            styleElement.appendChild(document.createTextNode(cssCode));
+        }
+        document.getElementsByTagName("head")[0].appendChild(styleElement);
+        
+        instantiateTemplate({noTransition: false});
+        var rightArrow = getRightArrow()[0];
+        testSlideActive(0);
+        fireEvent("click", rightArrow);
+        hsp.refresh();
+        fireEvent("click", rightArrow);
+        hsp.refresh();
+        setTimeout(function() {
+            testSlideActive(2);
+            done();
+        }, 300);
+    });
 });

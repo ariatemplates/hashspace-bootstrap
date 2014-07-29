@@ -57,6 +57,16 @@ describe('Carousel controller', function() {
         expect(ctrl.index).to.be(0);
     });
 
+    it('should not update index if out of range', function() {
+        expect(ctrl.index).to.be(0);
+        ctrl.index = 4;
+        ctrl.onIndexChange(4, 0);
+        expect(ctrl.index).to.be(0);
+        ctrl.index = -1;
+        ctrl.onIndexChange(-1, 0);
+        expect(ctrl.index).to.be(0);
+    });
+
     it('should not change if next is called while transitioning', function() {
         expect(ctrl.index).to.be(0);
         ctrl.isTransitioning = true;
