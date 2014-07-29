@@ -121,7 +121,7 @@ exports.test = {
     reporters: ['dots', 'coverage'],
     browsers: ['Firefox'],
     coverageReporter: {
-      type : 'lcovonly',
+      type : 'lcovonly', //Set to html instead of lcovonly to get a readable report
       dir : 'test-results/karma/'
     }
 };

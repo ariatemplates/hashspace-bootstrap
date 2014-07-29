@@ -51,7 +51,7 @@ exports.CarouselController = new klass({
                         that._finalizeTransition.call(that);
                     }, false);
                 }                
-            }, 50);
+            }, 30);
         }
     },
     _getNumberOfSlides: function() {
@@ -165,9 +165,12 @@ exports.CarouselController = new klass({
             }
         }
     },
-    onIndexChange: function() {
+    onIndexChange: function(newValue, oldValue) {
         if (this.index >= 0 && this.index < this._getNumberOfSlides()) {
             this._navigateTo(this.index);
+        }
+        else {
+            this.index = oldValue;
         }
     },
     onIntervalChange: function(newValue, oldValue) {
