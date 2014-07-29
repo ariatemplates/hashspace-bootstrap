@@ -50,7 +50,7 @@ exports.CarouselController = new klass({
                         this.removeEventListener(that.transitionEnd, arguments.callee, false);
                         that._finalizeTransition.call(that);
                     }, false);
-                }                
+                }
             }, 30);
         }
     },
@@ -92,7 +92,7 @@ exports.CarouselController = new klass({
             }
             if (this.transitionEnd) {
                 this.nextIndex = nextIndex;
-                this.ongoingNavigation = (isToRight || typeof isToRight === "undefined" && nextIndex > this.internalIndex)? "next" : "prev";    
+                this.ongoingNavigation = (isToRight || typeof isToRight === "undefined" && nextIndex > this.internalIndex)? "next" : "prev";
             }
             else {
                 this.internalIndex = this.nextIndex = nextIndex;
@@ -136,7 +136,7 @@ exports.CarouselController = new klass({
         if (this.interval >= 0) {
             var _this = this;
             this.timerId = setInterval(function() {
-                _this.next();    
+                _this.next();
             }, this.interval > 600 ? this.interval: 600); //600ms is the transition duration defined in BS css
         }
     },
@@ -151,7 +151,7 @@ exports.CarouselController = new klass({
             if (this.timerId) {
                 this._stopCycling();
             } else {
-                this._startCycling();  
+                this._startCycling();
             }
         }
     },
