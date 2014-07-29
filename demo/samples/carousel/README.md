@@ -15,7 +15,7 @@ A carousel component similar to [Bootstrap javascript carousel](http://getbootst
 | ---- | ----------- | - |
 | **@slide** | A slide of the carousel. | |
 | **@slide / @body** | The body of the slide, any HTML element. | **Default** |
-| **@slide / @caption** | The caption of the slide, a block of HTML displayed at the bttom center. | Optionnal |
+| **@slide / @caption** | The caption of the slide, a block of HTML displayed at the bottom center. | Optionnal |
 
 #### Events ####
 

@@ -1,0 +1,99 @@
+var tabbar = require('../../src/tabbar/tabbar.hsp').tabbar;
+var doc = require("hsp/rt/document");
+var $set = require("hsp/$set");
+var hsp = require("hsp/rt");
+var fireEvent=require("hsp/utils/eventgenerator").fireEvent;
+var touchEventMap = require("hsp/gestures/touchEvent").touchEventMap;
+
+{template test(model)}
+    <#tabbar index="{model.index}" noTransition="{model.noTransition}">
+        <@tab>
+            <@label>Panel 1 content</@label>
+            <@content>
+                <span id="panel_1">Panel 1</span>
+            </@content>
+        </@tab>
+        <@tab label="Panel 2">
+            <span id="panel_2">Panel 2 content</span>
+        </@tab>
+    </#tabbar>
+{/template}
+
+describe('Tabbar', function() {
+    var container;
+    var template;
+    var clock;
+    var model;
+    before(function(){
+        container = doc.createElement("div");
+        //clock = sinon.useFakeTimers();
+    });
+    after(function() {
+        disposeTemplate();
+        container = null;
+        //clock.restore();
+    });
+
+    function instantiateTemplate() {
+        template = test(model);
+        template.render(container);
+    };
+
+    function disposeTemplate() {
+        if (template && template.root) {
+            template.$dispose();
+        }
+        template = null;
+    };
+
+    function getTabs() {
+        var ul = container.querySelectorAll('ul')[0];
+        return ul.querySelectorAll('li');
+    }
+
+    function testTabs(activeIndex) {
+        var tabs = getTabs();
+        var nbActiveTabs = 0;
+        expect(activeIndex).to.be.below(tabs.length);
+        for (var i = 0; i < tabs.length; i++) {
+            var tab = tabs[i];
+            var isActive = tab.className.indexOf("active") > -1;
+
+            if (isActive) {
+                nbActiveTabs++;
+                expect(i).to.be(activeIndex);
+            } else {
+                expect(i).not.to.be(activeIndex);
+            }
+        }
+        expect(nbActiveTabs).to.be(1);
+    }
+
+    it('should be well initialized', function() {
+        model = {
+            index: 0,
+            noTransition: true
+        };
+        instantiateTemplate();
+        //console.log(model);
+        testTabs(0);
+    });
+
+    it('tests the model change', function() {
+        $set(model, "index", 1);
+        hsp.refresh();
+        testTabs(1);
+
+        // Test the range : over the limits, the tab should stick to the limit
+        $set(model, "index", 2);
+        hsp.refresh();
+        testTabs(1);
+        expect(model.index).to.be(1);
+
+        $set(model, "index", -1);
+        hsp.refresh();
+        testTabs(0);
+        expect(model.index).to.be(0);
+
+    });
+});

@@ -44,7 +44,10 @@ function html2hsp() {
 }
 
 gulp.task('checkstyle', function() {
-    return gulp.src(['src/**/*.js', 'demo/**/*.js', 'test/**/*.js', '!demo/lib/**/*.*']).pipe(jshint()).pipe(jshint.reporter("default")).pipe(jshint.reporter("fail"));
+    return gulp.src(['src/**/*.js', 'demo/**/*.js', 'test/**/*.js', '!demo/lib/**/*.*']).
+        pipe(jshint({eqnull: true})).
+        pipe(jshint.reporter("default")).
+        pipe(jshint.reporter("fail"));
 });
 
 gulp.task('clean', function (done) {
