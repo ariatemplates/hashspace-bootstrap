@@ -1,4 +1,4 @@
-A carousel component similar to [Bootstrap javascript carousel](http://getbootstrap.com/javascript/#carousel)
+A tabbar component similar to [Bootstrap javascript togglable tabs](http://getbootstrap.com/javascript/#tabs)
 
 #### Attributes ####
 
@@ -14,10 +14,8 @@ A carousel component similar to [Bootstrap javascript carousel](http://getbootst
 | ---- | ----------- | - |
 | **@tab** | A tab of the carousel. | |
 | **@tab / @content** | The content of the tab, any HTML element. | **Default** |
-| **@tab / @label** | The label of the tab, a block of HTML displayed at the bottom center. |
-| **@tab / @disable** | boolean. false by default. If true, the tab is disabled and not clickable |
-
-|
+| **@tab / @label** | The label of the tab, a block of HTML displayed at the bottom center. | |
+| **@tab / @disable** | boolean. false by default. If true, the tab is disabled and not clickable | |
 
 #### Events ####
 
