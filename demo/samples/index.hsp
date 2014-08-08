@@ -7,9 +7,16 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <a class="navbar-brand" href="#">Hashspace-Bootstrap</a>
-                {foreach demo in demos}
-                    <a class="navbar-brand" href="#{demo.id}">{demo.prettyName}</a>
-                {/foreach}
+                <ul class="nav navbar-nav">
+                    <li class="dropdown" bootstrap-dropdown>
+                        <a href="#" role="button" class="dropdown-toggle" bootstrap-dropdown-toggle>Components <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            {foreach demo in demos}
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="#{demo.id}">{demo.prettyName}</a></li>
+                            {/foreach}
+                      </ul>
+                    </li>
+                </ul>
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">

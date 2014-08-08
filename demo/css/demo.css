@@ -13,6 +13,9 @@ body {
 .navbar-inverse .navbar-brand:hover,  .navbar-inverse .navbar-nav>li>a:hover {
     color: #bed63a;
 }
+.navbar-inverse .navbar-nav > .open > a, .navbar-inverse .navbar-nav > .open > a:hover, .navbar-inverse .navbar-nav > .open > a:focus {
+    background-color: #345d75;
+}
 
 h1 {
     color: #bfd730;

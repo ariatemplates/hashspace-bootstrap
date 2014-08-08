@@ -4,6 +4,7 @@ var asyncRequire = require("noder-js/asyncRequire");
 var demos = [
     {id: 'carousel', prettyName: 'Carousel'},
     {id: 'tabbar', prettyName: 'Togglable tabs'},
+    {id: 'dropdown', prettyName: 'Dropdown'},
     {id: 'alert', prettyName: 'Alert messages'}
 ];
 

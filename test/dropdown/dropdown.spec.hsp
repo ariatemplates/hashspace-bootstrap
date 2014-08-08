@@ -1,0 +1,381 @@
+<script>
+    var CarouselController = require('../../src/dropdown/dropdown.js');
+    var doc = require("hsp/rt/document");
+    var $set = require("hsp/$set");
+    var hsp = require("hsp/rt");
+    var fireEvent = require("hsp/utils/eventgenerator").fireEvent;
+</script>
+
+<template id="test" args="model">
+    <div class="dropdown" bootstrap-dropdown bootstrap-dropdown-isopen="{model.isopen}">
+        <button class="btn btn-default" type="button" bootstrap-dropdown-toggle>
+            Dropdown
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+        </ul>
+    </div>
+    {if model.numberOfDropdown > 1}
+        <div class="dropdown" bootstrap-dropdown>
+            <button class="btn btn-default" type="button" bootstrap-dropdown-toggle>
+                Dropdown
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+            </ul>
+        </div>
+    {/if}
+</template>
+
+<template id="testDisabled1" args="model">
+    <div class="dropdown" bootstrap-dropdown bootstrap-dropdown-isopen="{model.isopen}">
+        <button class="btn btn-default disabled" type="button" bootstrap-dropdown-toggle>
+            Dropdown
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+        </ul>
+    </div>
+</template>
+
+<template id="testDisabled2" args="model">
+    <div class="dropdown" bootstrap-dropdown bootstrap-dropdown-isopen="{model.isopen}">
+        <button class="btn btn-default" type="button" bootstrap-dropdown-toggle disabled>
+            Dropdown
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+        </ul>
+    </div>
+</template>
+
+<template id="testWithoutTrigger" args="model">
+    <div class="dropdown" bootstrap-dropdown bootstrap-dropdown-isopen="{model.isopen}">
+        <ul class="dropdown-menu" role="menu">
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+        </ul>
+    </div>
+</template>
+
+<template id="testCallback" args="model">
+    <div class="dropdown" bootstrap-dropdown bootstrap-dropdown-isopen="{model.isopen}" bootstrap-dropdown-ontoggle="{model.onToggleCB}">
+        <button class="btn btn-default" type="button" bootstrap-dropdown-toggle>
+            Dropdown
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+        </ul>
+    </div>
+</template>
+
+<template id="testCallback2" args="model">
+    <div class="dropdown" bootstrap-dropdown bootstrap-dropdown-ontoggle="{model.onToggleCB}">
+        <button class="btn btn-default" type="button" bootstrap-dropdown-toggle>
+            Dropdown
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+        </ul>
+    </div>
+</template>
+
+<script>
+describe('Dropdown custom attribute controller', function() {
+
+    var container;
+    var template;
+    var clock;
+    beforeEach(function(){
+        container = doc.createElement("div");
+        //clock = sinon.useFakeTimers();
+        document.body.appendChild(container);
+    });
+    afterEach(function() {
+        if (template.root) {
+            template.$dispose();
+        }
+        template = null;
+        container = null;
+        document.body.removeChild(document.body.childNodes[document.body.childNodes.length - 1]);
+        //clock.restore();
+    });
+
+    function instantiateTemplate(model) {
+        template = test(model);
+        template.render(container);
+    }
+
+    function getDropdown(index) {
+        return container.querySelectorAll(".dropdown")[index];
+    }
+    function getToggler(index) {
+        return container.querySelectorAll("button")[index];
+    }
+
+    function testDropdownOpen(opened, index) {
+        var dropdown = getDropdown(index);
+        var isOpen = dropdown.className.indexOf("open") > -1;
+        if (opened) {
+            expect(isOpen).to.be.ok();
+        }
+        else {
+            expect(isOpen).not.to.be.ok();
+        }
+    }
+
+    it('should toggle on data model change', function() {
+        var model = {isopen: false};
+        instantiateTemplate(model);
+        testDropdownOpen(false, 0);
+        $set(model, "isopen", true);
+        hsp.refresh();
+        testDropdownOpen(true, 0);
+        $set(model, "isopen", false);
+        hsp.refresh();
+        testDropdownOpen(false, 0);
+    });
+
+    it('should be initially opened', function() {
+        var model = {isopen: true};
+        instantiateTemplate(model);
+        testDropdownOpen(true, 0);
+    });
+
+    it('should focus toggle element when opening', function() {
+        var model = {isopen: false};
+        instantiateTemplate(model);
+        testDropdownOpen(false, 0);
+        $set(model, "isopen", true);
+        hsp.refresh();
+        testDropdownOpen(true, 0);
+        expect(getToggler(0)).to.eql(document.activeElement);
+    });
+
+    it('should toggle on click', function() {
+        var model = {isopen: false};
+        instantiateTemplate(model);
+        testDropdownOpen(false, 0);
+        fireEvent("click", getToggler(0));
+        hsp.refresh();
+        testDropdownOpen(true, 0);
+        expect(model.isopen).to.be.ok();
+        fireEvent("click", getToggler(0));
+        hsp.refresh();
+        testDropdownOpen(false, 0);
+        expect(model.isopen).not.to.be.ok();
+    });
+
+    it('should close when an option is clicked', function(done) {
+        instantiateTemplate({isopen: false});
+        testDropdownOpen(false, 0);
+        fireEvent("click", getToggler(0)); 
+        hsp.refresh();
+        testDropdownOpen(true, 0);
+
+        setTimeout(function() {
+            var option = container.querySelector("a");
+            fireEvent("click", option);
+            hsp.refresh();
+            testDropdownOpen(false, 0);
+            done();
+        }, 10);
+    });
+
+    it('should close on document click', function(done) {
+        instantiateTemplate({isopen: false});
+        testDropdownOpen(false, 0);
+        fireEvent("click", getToggler(0));
+        hsp.refresh();
+        testDropdownOpen(true, 0);
+
+        setTimeout(function() {
+            fireEvent("click", document);
+            hsp.refresh();
+            testDropdownOpen(false, 0);
+            done();
+        }, 10);
+    });
+
+    it('should close on escape key & focus toggle element', function(done) {
+        instantiateTemplate({isopen: false});
+        testDropdownOpen(false, 0);
+        fireEvent("click", getToggler(0));
+        hsp.refresh();
+        testDropdownOpen(true, 0);
+
+        setTimeout(function() {
+            fireEvent("keydown", document, {keyCode : 27});
+            hsp.refresh();
+            testDropdownOpen(false, 0);
+            expect(getToggler(0)).to.eql(document.activeElement);
+            done();
+        }, 10);
+    });
+
+    it('should not close on backspace key', function(done) {
+        instantiateTemplate({isopen: false});
+        testDropdownOpen(false, 0);
+        fireEvent("click", getToggler(0));
+        hsp.refresh();
+        testDropdownOpen(true, 0);
+
+        setTimeout(function() {
+            fireEvent("keydown", document, {keyCode : 8});
+            hsp.refresh();
+            testDropdownOpen(true, 0);
+            done();
+        }, 10);
+    });
+
+    it('should only allow one dropdown to be open at once', function(done) {
+        instantiateTemplate({isopen: false, numberOfDropdown: 2});
+        testDropdownOpen(false, 0);
+        testDropdownOpen(false, 1);
+
+        fireEvent("click", getToggler(0));
+        hsp.refresh();
+        testDropdownOpen(true, 0);
+        testDropdownOpen(false, 1);
+
+        setTimeout(function() {
+            fireEvent("click", getToggler(1));
+            hsp.refresh();
+            testDropdownOpen(false, 0);
+            testDropdownOpen(true, 1);
+            done();
+        }, 10);
+    });
+
+    it('should not toggle if the element has `disabled` class', function() {
+        var model = {isopen: false};
+        template = testDisabled1(model);
+        template.render(container);
+        fireEvent("click", getToggler(0));
+        hsp.refresh();
+        testDropdownOpen(false, 0);
+
+        $set(model, "isopen", true);
+        hsp.refresh();
+        testDropdownOpen(false, 0);
+    });
+
+    it('should not toggle if the element is disabled', function() {
+        var model = {isopen: false};
+        template = testDisabled2(model);
+        template.render(container);
+        fireEvent("click", getToggler(0));
+        hsp.refresh();
+        testDropdownOpen(false, 0);
+
+        $set(model, "isopen", true);
+        hsp.refresh();
+        testDropdownOpen(false, 0);
+    });
+
+    it('should work without trigger', function() {
+        var model = {isopen: true};
+        template = testWithoutTrigger(model);
+        template.render(container);
+
+        testDropdownOpen(true, 0);
+
+        $set(model, "isopen", false);
+        hsp.refresh();
+        testDropdownOpen(false, 0);
+    });
+
+    it('should execute callback', function() {
+        var model = {
+            isopen: false,
+            onToggleCB: function() {}
+        };
+        sinon.spy(model, "onToggleCB");
+        template = testCallback(model);
+        template.render(container);
+        expect(model.onToggleCB.called).not.to.be.ok();
+
+        fireEvent("click", getToggler(0));
+        hsp.refresh();
+        expect(model.onToggleCB.calledOnce).to.be.ok();
+
+        $set(model, "isopen", true);
+        hsp.refresh();
+        expect(model.onToggleCB.calledOnce).to.be.ok();
+
+        $set(model, "isopen", false);
+        hsp.refresh();
+        expect(model.onToggleCB.calledTwice).to.be.ok();
+    });
+
+    it('should execute callback without bootstrap-dropdown-isopen', function() {
+        var model = {
+            onToggleCB: function() {}
+        };
+        sinon.spy(model, "onToggleCB");
+        template = testCallback(model);
+        template.render(container);
+        expect(model.onToggleCB.called).not.to.be.ok();
+
+        fireEvent("click", getToggler(0));
+        hsp.refresh();
+        expect(model.onToggleCB.calledOnce).to.be.ok();
+
+        fireEvent("click", getToggler(0));
+        hsp.refresh();
+        expect(model.onToggleCB.calledTwice).to.be.ok();
+    });
+
+    it('should open dropdown when pressing arrow down', function(done) {
+        instantiateTemplate({isopen: false, numberOfDropdown: 2});
+        testDropdownOpen(false, 0);
+        testDropdownOpen(false, 1);
+
+        fireEvent("click", getToggler(0));
+        hsp.refresh();
+        testDropdownOpen(true, 0);
+        testDropdownOpen(false, 1);
+
+        setTimeout(function() {
+            fireEvent("keydown", getToggler(1), {keyCode: 40});
+            hsp.refresh();
+            testDropdownOpen(false, 0);
+            testDropdownOpen(true, 1);
+            done();
+        }, 10);
+    });
+
+    it('should navigate items when pressing arrow down and up keys', function(done) {
+        instantiateTemplate({isopen: true});
+        setTimeout(function() {
+            var items = container.querySelectorAll('[role="menuitem"]');
+
+            fireEvent("keydown", document, {keyCode: 40});
+            hsp.refresh();
+            expect(items[0]).to.eql(document.activeElement);
+            fireEvent("keydown", document, {keyCode: 40});
+            hsp.refresh();
+            expect(items[1]).to.eql(document.activeElement);
+            fireEvent("keydown", document, {keyCode: 40});
+            hsp.refresh();
+            expect(items[2]).to.eql(document.activeElement);
+            fireEvent("keydown", document, {keyCode: 40});
+            hsp.refresh();
+            expect(items[2]).to.eql(document.activeElement);
+
+            fireEvent("keydown", document, {keyCode: 38});
+            hsp.refresh();
+            expect(items[1]).to.eql(document.activeElement);
+            fireEvent("keydown", document, {keyCode: 38});
+            hsp.refresh();
+            expect(items[0]).to.eql(document.activeElement);
+            fireEvent("keydown", document, {keyCode: 38});
+            hsp.refresh();
+            expect(items[0]).to.eql(document.activeElement);
+
+            done();
+        }, 10);
+    });
+});
+</script>
