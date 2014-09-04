@@ -2,3 +2,5 @@
 /target
 /sc.log
 /test-results
+.project
+.settings

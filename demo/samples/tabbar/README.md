@@ -6,8 +6,8 @@ A tabbar component similar to [Bootstrap javascript togglable tabs](http://getbo
 | ---- | ------- | ---- | ------- | ----------- |
 | **index** | 2-way | int | 0 | Index (0-based) of the active tab. |
 | **noTransition** | none | boolean | false | Whether transitions are activated. |
-| **display** | none | string | tabs | Define how the tabs must be display. The availables values are tabs, pills and vertical |
-| **justified** | none | boolean | false | if true, the tabs width are equaly distribuated through the whole width |
+| **display** | none | string | "tabs" | Define how the tabs must be display. The available values are "tabs", "pills" and "vertical" |
+| **justified** | none | boolean | false | if true, the tabs width are equally distributed through the whole width |
 
 #### Elements ####
 | Name | Description |  |
@@ -15,7 +15,7 @@ A tabbar component similar to [Bootstrap javascript togglable tabs](http://getbo
 | **@tab** | A tab of the carousel. | |
 | **@tab / @content** | The content of the tab, any HTML element. | **Default** |
 | **@tab / @label** | The label of the tab, a block of HTML displayed at the bottom center. | |
-| **@tab / @disable** | boolean. false by default. If true, the tab is disabled and not clickable | |
+| **@tab / @disabled** | boolean. false by default. If true, the tab is disabled and not clickable | |
 
 #### Events ####
 

@@ -2,36 +2,95 @@ var tabbar = require('../../src/tabbar/tabbar.hsp').tabbar;
 var doc = require("hsp/rt/document");
 var $set = require("hsp/$set");
 var hsp = require("hsp/rt");
-var fireEvent=require("hsp/utils/eventgenerator").fireEvent;
-var touchEventMap = require("hsp/gestures/touchEvent").touchEventMap;
+var fireEvent = require("hsp/utils/eventgenerator").fireEvent;
+
+var controllerClass = require('../../src/tabbar/tabbar.js').TabbarController;
+var controllerInstance = new controllerClass();
+controllerInstance.$init();
+var browserWithTransitions = controllerInstance.actuallyHasTransitions;
+controllerInstance.$dispose();
+
 
 {template test(model)}
-    <#tabbar index="{model.index}" noTransition="{model.noTransition}">
-        <@tab>
-            <@label>Panel 1 content</@label>
-            <@content>
-                <span id="panel_1">Panel 1</span>
-            </@content>
-        </@tab>
-        <@tab label="Panel 2">
-            <span id="panel_2">Panel 2 content</span>
-        </@tab>
+    <#tabbar
+        index="{model.index}"
+        noTransition="{model.noTransition}"
+        justified="{model.justified}"
+        display="{model.display}"
+        onshow="{model.onshowCB(event.index)}"
+        onshown="{model.onshownCB(event.index)}"
+    >
+        {foreach index, tab in model.tabs}
+            {if index%2 == 0}
+                <@tab disabled="{tab.disabled}">
+                    <@label>{tab.label}</@label>
+                    <@content>
+                        <span id="panel_{index}">Panel {index}</span>
+                    </@content>
+                </@tab>
+            {else}
+                <@tab label="{tab.label}" disabled="{tab.disabled}">
+                    <span id="panel_{index}">Panel {index} content</span>
+                </@tab>
+            {/if}
+        {/foreach}
+
+    </#tabbar>
+
+{/template}
+
+{template emptyTest(model)}
+    <#tabbar index="{model.index}">
     </#tabbar>
 {/template}
 
+
+
 describe('Tabbar', function() {
+
+    this.timeout(5000);
     var container;
     var template;
     var clock;
-    var model;
+    var model = {
+        index: 0,
+        noTransition: true,
+        justified : false,
+        display : "tabs",
+        tabs: [{
+            label: "Panel 1",
+            disabled : false
+        }, {
+            label: "Panel 2",
+            disabled : false
+        }, {
+            label: "Panel 3",
+            disabled : true
+        }, {
+            label: "Panel 4",
+            disabled : false
+        }],
+        onshowCB: function (index) {
+            show.push(index);
+        },
+        onshownCB: function (index) {
+            shown.push(index);
+        }
+    };
+    var show = [];
+    var shown = [];
+
     before(function(){
         container = doc.createElement("div");
-        //clock = sinon.useFakeTimers();
     });
     after(function() {
-        disposeTemplate();
         container = null;
-        //clock.restore();
+    });
+
+    afterEach(function() {
+        disposeTemplate();
+        show = [];
+        shown = [];
     });
 
     function instantiateTemplate() {
@@ -49,9 +108,13 @@ describe('Tabbar', function() {
     function getTabs() {
         var ul = container.querySelectorAll('ul')[0];
         return ul.querySelectorAll('li');
-    }
+    };
 
-    function testTabs(activeIndex) {
+    function getTabAnchor(index) {
+        return getTabs()[index].querySelectorAll("a")[0]
+    };
+
+    function testTabsActivation(activeIndex, skipContent) {
         var tabs = getTabs();
         var nbActiveTabs = 0;
         expect(activeIndex).to.be.below(tabs.length);
@@ -67,33 +130,256 @@ describe('Tabbar', function() {
             }
         }
         expect(nbActiveTabs).to.be(1);
-    }
+        if (!skipContent) {
+            expect(container.querySelectorAll('#panel_' + activeIndex).length).to.be(1);
+        }
+    };
 
     it('should be well initialized', function() {
-        model = {
-            index: 0,
-            noTransition: true
-        };
         instantiateTemplate();
-        //console.log(model);
-        testTabs(0);
+        testTabsActivation(0);
     });
 
-    it('tests the model change', function() {
+     it('should be well initialized even if empty', function() {
+         var simpleModel = {
+             index : 0
+         };
+        template = emptyTest(simpleModel);
+        template.render(container);
+        //expect(simpleModel.index).to.be(-1);
+    });
+
+    it('tests the reaction to index changes in the data model', function() {
+        instantiateTemplate();
+
         $set(model, "index", 1);
         hsp.refresh();
-        testTabs(1);
+        testTabsActivation(1);
+        expect(show).to.eql([0, 1]);
+        expect(shown).to.eql([0, 1]);
 
         // Test the range : over the limits, the tab should stick to the limit
-        $set(model, "index", 2);
+        $set(model, "index", 4);
         hsp.refresh();
-        testTabs(1);
-        expect(model.index).to.be(1);
+        testTabsActivation(3);
+        expect(model.index).to.be(3);
+        expect(show).to.eql([0, 1, 3]);
+        expect(shown).to.eql([0, 1, 3]);
 
         $set(model, "index", -1);
         hsp.refresh();
-        testTabs(0);
+        testTabsActivation(0);
         expect(model.index).to.be(0);
+        expect(show).to.eql([0, 1, 3, 0]);
+        expect(shown).to.eql([0, 1, 3, 0]);
+
+        // Test disabled tabs
+        $set(model, "index", 2);
+        hsp.refresh();
+        testTabsActivation(0);
+        expect(model.index).to.be(0);
+        expect(show).to.eql([0, 1, 3, 0]);
+        expect(shown).to.eql([0, 1, 3, 0]);
+    });
+
+    it('tests click on tabs', function () {
+        instantiateTemplate();
+        fireEvent("click", getTabAnchor(1));
+        hsp.refresh();
+        testTabsActivation(1);
+        expect(model.index).to.be(1);
+        expect(show).to.eql([0, 1]);
+        expect(shown).to.eql([0, 1]);
+
+        // Click on disabled tab
+        fireEvent("click", getTabAnchor(2));
+        hsp.refresh();
+        testTabsActivation(1);
+        expect(model.index).to.be(1);
+        expect(show).to.eql([0, 1]);
+        expect(shown).to.eql([0, 1]);
+
+        fireEvent("click", getTabAnchor(3));
+        hsp.refresh();
+        testTabsActivation(3);
+        expect(model.index).to.be(3);
+        expect(show).to.eql([0, 1, 3]);
+        expect(shown).to.eql([0, 1, 3]);
+    });
+
+    it('tests content change', function () {
+        model.index = 1;
+        instantiateTemplate();
+
+        // Add one tab
+        $set(model.tabs, 4, {
+            label: "Panel 5",
+            disabled : false
+        });
+        hsp.refresh();
+        expect(getTabs().length).to.be(5);
+        // Test that previously active tab is still active
+        testTabsActivation(1);
+
+        $set(model, "tabs", [{
+                label: "Panel 1",
+                disabled : false
+            }, {
+                label: "Panel 2",
+                disabled : true
+            }, {
+                label: "Panel 3",
+                disabled : true
+            }]);
+
+        hsp.refresh();
+
+        testTabsActivation(0);
+        expect(model.index).to.be(0);
+        expect(show).to.eql([1, 0]);
+        expect(shown).to.eql([1, 0]);
+
+        $set(model, "tabs", [{
+                label: "Panel 1",
+                disabled : true
+            }, {
+                label: "Panel 2",
+                disabled : true
+            }, {
+                label: "Panel 3",
+                disabled : false
+            }]);
+
+        hsp.refresh();
+
+        testTabsActivation(2);
+        expect(model.index).to.be(2);
+        expect(show).to.eql([1, 0, 2]);
+        expect(shown).to.eql([1, 0, 2]);
+
+        $set(model, "tabs", [{
+                label: "Panel 1",
+                disabled : true
+            }, {
+                label: "Panel 2",
+                disabled : true
+            }, {
+                label: "Panel 3",
+                disabled : true
+            }]);
+
+        hsp.refresh();
+
+        expect(model.index).to.be(-1);
+        expect(show).to.eql([1, 0, 2]);
+    });
+
+    it('should correctly initialize when all tabs are disabled', function () {
+        model.tabs = [{
+                label: "Panel 1",
+                disabled : true
+            }, {
+                label: "Panel 2",
+                disabled : true
+            }, {
+                label: "Panel 3",
+                disabled : true
+            }];
+        model.index = 0;
+        instantiateTemplate();
+        //expect(model.index).to.be(-1);
+        expect(show).to.eql([]);
+        expect(shown).to.eql([]);
 
     });
+    it('should work with transitions', function (done) {
+        window.document.body.appendChild(container);
+        addTransitionCSS();
+        var iteration = 0;
+
+        model.onshownCB = function (index) {
+
+            shown.push(index);
+            if (iteration == 0) {
+                setTimeout(function () {
+                    testTabsActivation(0);
+                    expect(model.index).to.be(0);
+                    expect(show).to.eql([0]);
+                    expect(shown).to.eql([0]);
+                    iteration++;
+                    fireEvent("click", getTabAnchor(2));
+                    hsp.refresh();
+                    if (browserWithTransitions) {
+                        testTabsActivation(2, true);
+                        expect(model.index).to.be(2);
+                        expect(show).to.eql([0, 2]);
+                        expect(shown).to.eql([0]);
+                    }
+                }, 1000);
+            } else if (iteration == 1) {
+                iteration++
+                setTimeout(function () {
+                    testTabsActivation(2);
+                    expect(model.index).to.be(2);
+                    expect(show).to.eql([0, 2]);
+                    expect(shown).to.eql([0, 2]);
+                    fireEvent("click", getTabAnchor(0));
+                    hsp.refresh();
+                    fireEvent("click", getTabAnchor(3));
+                    hsp.refresh();
+                }, 100);
+            } else if (iteration == 2) {
+                iteration++
+                setTimeout(function () {
+                    testTabsActivation(3);
+                    expect(model.index).to.be(3);
+                    expect(show).to.eql([0, 2, 0, 3]);
+                    if (browserWithTransitions) {
+                        expect(shown).to.eql([0, 2, 3]);
+                    } else {
+                        expect(shown).to.eql([0, 2, 0, 3]);
+                    }
+                    window.document.body.removeChild(container);
+                    done();
+                }, 100);
+            }
+        };
+        model.tabs = [{
+                label: "Panel 1",
+                disabled : false
+            }, {
+                label: "Panel 2",
+                disabled : true
+            }, {
+                label: "Panel 3",
+                disabled : false
+            }, {
+                label: "Panel 4",
+                disabled : false
+            }];
+
+        model.noTransition = false;
+        model.index = 0;
+        instantiateTemplate();
+        hsp.refresh();
+
+        if (browserWithTransitions) {
+            testTabsActivation(0, true);
+            expect(model.index).to.be(0);
+            expect(show).to.eql([0]);
+            expect(shown).to.eql([0]);
+        }
+    });
+
+    function addTransitionCSS () {
+        var cssCode = ".fade{opacity:0;-webkit-transition:opacity 1000ms linear;transition:opacity 1000ms linear}.fade.in{opacity:1}";
+        var styleElement = document.createElement("style");
+        styleElement.type = "text/css";
+        if (styleElement.styleSheet) {
+            styleElement.styleSheet.cssText = cssCode;
+        } else {
+            styleElement.appendChild(document.createTextNode(cssCode));
+        }
+        document.getElementsByTagName("head")[0].appendChild(styleElement);
+    }
 });

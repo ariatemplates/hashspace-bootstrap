@@ -7,16 +7,16 @@
 !!! Work in progress !!!
 ========================
 
-Hashspace components for Bootstrap.  
+Hashspace components for Bootstrap.
 
 Already implemented:
  - Carousel
+ - Togglable tabs
 
 To be implemented:
  - Modal
  - Dropdown
  - ScrollSpy
- - Togglable tabs
  - Tooltips
  - Popovers
  - Alert messages

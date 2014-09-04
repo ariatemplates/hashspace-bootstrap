@@ -2,19 +2,19 @@ var tabCtrl = require("./tabbar");
 var tabbarController = tabCtrl.TabbarController;
 
 {export template tabbar using ctrl:tabbarController}
-    <ul class="{'nav', 'nav-tabs': ctrl._tabsClass, 'nav-pills': ctrl._pillsClass, 'nav-stacked': ctrl._stackedClass, 'nav-justified': ctrl.justified}" role="tablist">
+    <ul class="{'nav', 'nav-tabs': ctrl.tabsClass, 'nav-pills': ctrl.pillsClass, 'nav-stacked': ctrl.stackedClass, 'nav-justified': ctrl.justified}" role="tablist">
         {foreach idx, tab in ctrl.content}
-        <li class="{'active':idx===ctrl.index, 'disabled': tab.disabled}">
-            <a href="#" role="tab" onclick="{ctrl.activate(event, idx)}"><#tab.label /></a>
-        </li>
+            <li class="{'active':idx===ctrl.index, 'disabled': tab.disabled}">
+                <a href="#" role="tab" onclick="{ctrl.activate(event, idx)}"><#tab.label /></a>
+            </li>
         {/foreach}
     </ul>
     <div class="tab-content">
-        {foreach idx, tab in ctrl.content}
-            {if tab._isActive}
-            <div class="{'tab-pane', 'active', 'fade': tab._fade, 'in': tab._in}">
-            <#tab.content />
-            </div>
+        {foreach tab in ctrl.content}
+            {if tab.active}
+                <div class="{'tab-pane', 'active', 'fade': tab._fade, 'in': tab._in}">
+                    <#tab.content />
+                </div>
             {/if}
         {/foreach}
     </div>
