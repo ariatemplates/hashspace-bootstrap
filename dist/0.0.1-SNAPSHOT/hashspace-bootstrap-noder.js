@@ -244,7 +244,7 @@ var tabbarController = tabCtrl.TabbarController;
 
 
 var tabbar =$set(exports, "tabbar", require("hsp/rt").template({ctl:[tabbarController,"tabbarController"],ref:"ctrl"}, function(n){
-  return [n.elt("ul",{e1:[6,function(a0,a1,a2,a3) {return ["nav",((a0)? ''+"nav-tabs":''),((a1)? ''+"nav-pills":''),((a2)? ''+"nav-stacked":''),((a3)? ''+"nav-justified":'')].join(' ');},2,3,4,5],e2:[1,2,"ctrl","_tabsClass"],e3:[1,2,"ctrl","_pillsClass"],e4:[1,2,"ctrl","_stackedClass"],e5:[1,2,"ctrl","justified"]},{"class":["",1],"role":"tablist"},0,[n.$foreach({e1:[1,2,"ctrl","content"]},"idx","tab",0,1,[n.elt("li",{e1:[6,function(a0,a1,a2) {return [(((a0 === a1))? ''+"active":''),((a2)? ''+"disabled":'')].join(' ');},2,3,4],e2:[1,1,"idx"],e3:[1,2,"ctrl","index"],e4:[1,2,"tab","disabled"]},{"class":["",1]},0,[n.elt("a",{e1:[3,2,"ctrl","activate",1,2,1,3],e2:[0,1,"event"],e3:[1,1,"idx"]},{"href":"#","role":"tab"},{"click":1},[n.cpt([null,"tab","label"],0,0,0)])])]),n.$text(0,[" "])]),n.elt("div",0,{"class":"tab-content"},0,[n.$foreach({e1:[1,2,"ctrl","content"]},"idx","tab",0,1,[n.$if({e1:[1,2,"tab","_isActive"]},1,[n.elt("div",{e1:[6,function(a0,a1) {return ["tab-pane","active",((a0)? ''+"fade":''),((a1)? ''+"in":'')].join(' ');},2,3],e2:[1,2,"tab","_fade"],e3:[1,2,"tab","_in"]},{"class":["",1]},0,[n.cpt([null,"tab","content"],0,0,0)])])]),n.$text(0,[" "])])];
+  return [n.elt("ul",{e1:[6,function(a0,a1,a2,a3) {return ["nav",((a0)? ''+"nav-tabs":''),((a1)? ''+"nav-pills":''),((a2)? ''+"nav-stacked":''),((a3)? ''+"nav-justified":'')].join(' ');},2,3,4,5],e2:[1,2,"ctrl","tabsClass"],e3:[1,2,"ctrl","pillsClass"],e4:[1,2,"ctrl","stackedClass"],e5:[1,2,"ctrl","justified"]},{"class":["",1],"role":"tablist"},0,[n.$foreach({e1:[1,2,"ctrl","content"]},"idx","tab",0,1,[n.elt("li",{e1:[6,function(a0,a1,a2) {return [(((a0 === a1))? ''+"active":''),((a2)? ''+"disabled":'')].join(' ');},2,3,4],e2:[1,1,"idx"],e3:[1,2,"ctrl","index"],e4:[1,2,"tab","disabled"]},{"class":["",1]},0,[n.elt("a",{e1:[3,2,"ctrl","activate",1,2,1,3],e2:[0,1,"event"],e3:[1,1,"idx"]},{"href":"#","role":"tab"},{"click":1},[n.cpt([null,"tab","label"],0,0,0)])])]),n.$text(0,[" "])]),n.elt("div",0,{"class":"tab-content"},0,[n.$foreach({e1:[1,2,"ctrl","content"]},"tab_key","tab",0,1,[n.$if({e1:[1,2,"tab","active"]},1,[n.elt("div",{e1:[6,function(a0,a1) {return ["tab-pane","active",((a0)? ''+"fade":''),((a1)? ''+"in":'')].join(' ');},2,3],e2:[1,2,"tab","_fade"],e3:[1,2,"tab","_in"]},{"class":["",1]},0,[n.cpt([null,"tab","content"],0,0,0)])])]),n.$text(0,[" "])])];
 }));
 
 });
@@ -253,168 +253,123 @@ var require = module.require, exports = module.exports, __filename = module.file
 
 var $set=require("hsp/$set"); var klass = require("hsp/klass");
 
-var queue = new klass({
-    $constructor: function() {
-        $set(this, "_queue", []);
-    },
-
-    add : function(obj, property, value, duration) {
-        var queue = this._queue;
-        queue.push({
-            obj: obj,
-            property: property,
-            value: value,
-            duration: duration
-        });
-        if (queue.length === 1) {
-            // Nothing in the queue before, we can process the queue right now
-            this.next();
+var TabController = klass({
+    attributes : {
+        label : {
+            type : "template"
+        },
+        disabled : {
+            type : "boolean",
+            defaultValue : false
+        },
+        content : {
+            type : "template",
+            defaultContent : true
         }
     },
-
-    next : function() {
-        var queue = this._queue;
-        if (queue.length) {
-            var that = this;
-            setTimeout(function() {
-                // Animation is done by changing a class on the html, i.e. changing a property in the model
-                var animation = queue.shift();
-                $set(animation.obj, animation.property, animation.value);
-                var duration = animation.duration;
-                // If duration is not defined, the queue must be managed by javascrit events (transition end, ...)
-                // and next() must be called externally
-                if (duration) {
-                    setTimeout(function() {that.next();}, duration);
-                }
-            }, 1);
+    $init : function (parent) {
+        if (this.active == null) {
+            $set(this, "active", false);
+        }
+        $set(this, "_fade", parent.actuallyHasTransitions);
+        if (this.active && this._fade) {
+            $set(this, "_in", true);
         }
     },
-    getLength : function() {
-        return this._queue.length;
-    }
-});
-var _animationQueue = new queue();
-
-var _tabId = 0;
-var TabController = new klass({
-    attributes: {
-        label: {type: "template"},
-        disabled: {type: "boolean", defaultValue: false},
-        content: {type: "template", defaultContent: true}
-    },
-
-    $init: function() {
-        if (this._isActive == null) {
-            $set(this, "_isActive", false);
-        }
-        $set(this, "_id", _tabId);
-        _tabId++;
-
-    },
-
-    toggleActivation : function(status) {
-        status = status == null ?
-                !this._isActive :
-                status;
+    setVisibility : function (status) {
+        $set(this, "active", status);
         if (this._fade) {
             if (status) {
-                _animationQueue.add(this, "_isActive", true, 1);
-                _animationQueue.add(this, "_in", true);
+                var that = this;
+                setTimeout(function () {
+                    $set(that, "_in", true);
+                }, 30);
             } else {
-                _animationQueue.add(this, "_in", false);
-                _animationQueue.add(this, "_isActive", false, 1);
+                $set(this, "_in", false);
             }
-         } else {
-            $set(this, "_isActive", status);
-         }
-    },
-
-    isActive : function() {
-        return this._isActive;
-    },
-
-    toggleFading : function(isEnable) {
-        $set(this, "_fade", isEnable);
+        }
     }
 });
 
-$set(exports, "TabbarController", new klass({
-    attributes: {
-        index: {type: "int", defaultValue: 0, binding: "2-way"},
-        noTransition: {type: "boolean", defaultValue: false},
-        display: {type: "string", defaultValue: "tabs"},
-        justified: {type: "boolean", defaultValue: false},
-        //BS events
-        "onshow": { type: "callback" },
-        "onshown": { type: "callback" },
-    },
-    elements: {
-        "tab": {type: "component", controller: TabController}
-    },
-    $init: function() {
-
-        var display = this.display;
-        if (display == "pills") {
-            $set(this, "_tabsClass", false);
-            $set(this, "_pillsClass", true);
-            $set(this, "_stackedClass", false);
-        } else if (display == "vertical") {
-            $set(this, "_tabsClass", false);
-            $set(this, "_pillsClass", true);
-            $set(this, "_stackedClass", true);
-        } else {
-            // default 'tabs'
-            $set(this, "_tabsClass", true);
-            $set(this, "_pillsClass", false);
-            $set(this, "_stackedClass", false);
+$set(exports, "TabbarController", klass({
+    attributes : {
+        index : {
+            type : "int",
+            defaultValue : 0,
+            binding : "2-way"
+        },
+        noTransition : {
+            type : "boolean",
+            defaultValue : false
+        },
+        display : {
+            type : "string",
+            defaultValue : "tabs"
+        },
+        justified : {
+            type : "boolean",
+            defaultValue : false
+        },
+        // BS events
+        "onshow" : {
+            type : "callback"
+        },
+        "onshown" : {
+            type : "callback"
         }
+    },
+    elements : {
+        "tab" : {
+            type : "component",
+            controller : TabController
+        }
+    },
+    $init : function () {
+        var display = this.display;
+        $set(this, "tabsClass", !display || display == "tabs");
+        $set(this, "pillsClass", display == "pills");
+        $set(this, "stackedClass", display == "vertical");
+        $set(this, "_tabsCount", this._getNumberOfTabs());
 
-        if (!this.noTransition) {
-            var transitionEnd = getTransitionEnd();
-            if (transitionEnd) {
-                // Initialize the tabs for fading
-                var tabs = this.content;
-                for(var i = 0; i < tabs.length; i++) {
-                    tabs[i].toggleFading(true);
-                }
+        $set(this, "_domReady", false);
+        $set(this, "_onshown", null);
 
+        $set(this, "transitionEnd", getTransitionEnd());
+        $set(this, "actuallyHasTransitions", !this.noTransition && !!this.transitionEnd);
+        $set(this, "_eventListener", null);
+
+        $set(this, "_currentIndex", null);
+        // Initialize
+        this._setIndex(this.index);
+    },
+    $refresh : function () {
+        if (!this._domReady) {
+            $set(this, "_domReady", true);
+            if (this.actuallyHasTransitions) {
+                var tabContentDiv = this.$getElement(1);
                 var that = this;
-                //TODO: Remove the setTimeout, the uggly DOM access and the listener part ...
-                setTimeout(function() {
-                    var tabContentDiv = that.$getElement(1);
-                    // Required for disposal
-                    $set(this, "_event", {
-                        dom: tabContentDiv,
-                        name: transitionEnd,
-                        fn: function() {
-                            if (!_animationQueue.getLength() && that.onshown) {
-                                // Callback after content show
-                                that.onshown();
-                            }
-                            _animationQueue.next();
-                        }
-                    });
-                    tabContentDiv.addEventListener(transitionEnd, this._event.fn, false);
-                }, 25);
-            } else {
-                // Animations not supported
-                $set(this, "noTransition", true);
+                $set(this, "_eventListener", {
+                    fn : function () {
+                        that.onshown({
+                            index : that._currentIndex
+                        });
+                    },
+                    element : tabContentDiv
+                });
+                tabContentDiv.addEventListener(this.transitionEnd, this._eventListener.fn, false);
             }
         }
-
-        // Initialize
-        this.content[this.index].toggleActivation(true);
-
     },
-    $dispose: function() {
-        if (this._event) {
-            var event = this._event;
-            event.dom.removeEventListener(event.name, event.fn);
+    $dispose : function () {
+        if (this._eventListener) {
+            this._eventListener.element.removeEventListener(this.transitionEnd, this._eventListener.fn, false);
+            $set(this, "_eventListener", null);
         }
     },
-    activate: function(event, idx) {
+
+    activate : function (event, idx) {
         if (!this.content[idx].disabled) {
-            $set(this, "index", idx);
+            this._setIndex(idx);
         }
         if (event.preventDefault) {
             event.preventDefault();
@@ -422,80 +377,112 @@ $set(exports, "TabbarController", new klass({
             $set(event, "returnValue", false);
         }
     },
-    _getNumberOfTabs: function() {
-        return this.content ? this.content.length: 0;
+    _getNumberOfTabs : function () {
+        return this.content ? this.content.length : 0;
     },
-    onIndexChange: function(newIndex, oldIndex) {
-        var nbTabs = this._getNumberOfTabs();
+
+    onIndexChange : function (newIndex) {
+        this._setIndex(newIndex);
+    },
+
+    _normalizeIndex : function (newIndex) {
+
+        var content = this.content;
+        var nbTabs = this._tabsCount;
+        if (!content || nbTabs === 0) {
+            return -1;
+        }
+        oldIndex = this._currentIndex;
+
         if (newIndex < 0) {
             newIndex = 0;
-        }
-        if (newIndex >= nbTabs) {
+        } else if (newIndex >= nbTabs) {
             newIndex = nbTabs - 1;
         }
+
+        if (content[newIndex].disabled && oldIndex !== null && oldIndex >= 0 && oldIndex < nbTabs) {
+            newIndex = oldIndex;
+        }
+        if (content[newIndex].disabled) {
+            var i = 0, available = false;
+            while (i < content.length) {
+                if (!content[i].disabled) {
+                    newIndex = i;
+                    available = true;
+                    break;
+                }
+                i++;
+            }
+            if (!available) {
+                return -1;
+            }
+        }
+        return newIndex;
+
+    },
+
+    _setIndex : function (newIndex) {
+        newIndex = this._normalizeIndex(newIndex);
 
         if (this.index != newIndex) {
             $set(this, "index", newIndex);
         }
 
-        // Manage the case where nothing change
-        if (newIndex == oldIndex) {
+        this._updateActivation(newIndex);
+    },
+
+    _updateActivation : function (newIndex) {
+        if (newIndex == this._currentIndex) {
             return;
         }
-
-        // Callback before content show
-        if (this.onshow) {
-            this.onshow();
-        }
-
-        // Toggle the contents
-        this.content[oldIndex].toggleActivation(false);
-        this.content[newIndex].toggleActivation(true);
-
-        if (this.noTransition && this.onshown) {
-            // Callback after content show, directly called when no animation
-            this.onshown();
-        }
-
-
+        var oldIndex = this._currentIndex;
+        $set(this, "_currentIndex", newIndex);
+        oldIndex = (oldIndex === null || oldIndex < 0 || oldIndex >= this._tabsCount) ? null : oldIndex;
+        newIndex = newIndex == -1 ? null : newIndex;
+        this.toggleActivation(oldIndex, newIndex);
     },
-    onContentChange: function(newContent, oldContent) {
-
-        // Look for the active tab, and set the index, in order to be sure that the old active tab is still selected
-        var found = false;
-        var newLength = newContent.length;
-        for(var i = 0; i < newLength; i++) {
-            if (newContent[i].isActive()) {
-                found = true;
-                break;
-            }
+    onContentChange : function (newContent, oldContent) {
+        $set(this, "_tabsCount", this._getNumberOfTabs());
+        this._setIndex(this._currentIndex);
+    },
+    toggleActivation : function (oldIndex, newIndex) {
+        if (newIndex === null) {
+            return;
         }
-        if (found) {
-            $set(this, "index", i);
+        var content = this.content;
+        this.onshow({
+            index : newIndex
+        });
+        if (oldIndex !== null) {
+            content[oldIndex].setVisibility(false);
+        }
+        content[newIndex].setVisibility(true);
+        if (this.actuallyHasTransitions && this._domReady) {
+            $set(this, "_onshown", newIndex);
         } else {
-            if (this.index >= newLength) {
-                $set(this, "index", newLength - 1);
-            }
+            this.onshown({
+                index : newIndex
+            });
         }
     }
 }));
 
-//CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
-//============================================================
-function getTransitionEnd() {
- var el = document.createElement('hashspace-bootstrap');
- var transEndEventNames = {
-     WebkitTransition : 'webkitTransitionEnd',
-     MozTransition    : 'transitionend',
-     OTransition      : 'oTransitionEnd otransitionend',
-     transition       : 'transitionend'
- };
- for (var name in transEndEventNames) {
-     if (el.style[name] !== undefined) {
-         return transEndEventNames[name];
-     }
- }
- return false;
+// CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
+// ============================================================
+function getTransitionEnd () {
+    var el = document.createElement('hashspace-bootstrap');
+    var transEndEventNames = {
+        WebkitTransition : 'webkitTransitionEnd',
+        MozTransition : 'transitionend',
+        OTransition : 'oTransitionEnd otransitionend',
+        transition : 'transitionend'
+    };
+    for (var name in transEndEventNames) {
+        if (el.style[name] !== undefined) {
+            return transEndEventNames[name];
+        }
+    }
+    return false;
 }
 
 });
