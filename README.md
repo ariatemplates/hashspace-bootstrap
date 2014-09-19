@@ -12,14 +12,14 @@ Hashspace components for Bootstrap.
 Already implemented:
  - Carousel
  - Togglable tabs
+ - Alert messages
 
 To be implemented:
  - Modal
  - Dropdown
  - ScrollSpy
  - Tooltips
- - Popovers
- - Alert messages
+ - Popovers 
  - Buttons
  - Collapse
  - Affix
