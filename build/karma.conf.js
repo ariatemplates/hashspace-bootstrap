@@ -32,13 +32,25 @@ exports.common = {
       'SL_Chrome': {
         base: 'SauceLabs',
         browserName: 'chrome',
+        platform: 'Windows 7',
+        version: '37'
+      },
+      'SL_Chrome_Beta': {
+        base: 'SauceLabs',
+        browserName: 'chrome',
         platform: 'Linux',
-        version: '35'
+        version: 'beta'
       },
       'SL_Firefox': {
         base: 'SauceLabs',
         browserName: 'firefox',
         platform: 'Linux'
+      },
+      'SL_Firefox_Beta': {
+        base: 'SauceLabs',
+        browserName: 'firefox',
+        platform: 'Linux',
+        version: 'beta'
       },
       'SL_Safari_6': {
         base: 'SauceLabs',
@@ -79,8 +91,8 @@ exports.common = {
       'SL_iOS_6': {
         base: 'SauceLabs',
         browserName: 'iphone',
-        platform: 'OS X 10.8',
-        version: '6.1'
+        platform: 'OS X 10.9',
+        version: '6.0'
       },
       'SL_iOS_7': {
         base: 'SauceLabs',
@@ -111,6 +123,12 @@ exports.common = {
         browserName: 'ANDROID',
         platform: 'Linux',
         version: '4.3'
+      },
+      'SL_Android_4.4': {
+        base: 'SauceLabs',
+        browserName: 'ANDROID',
+        platform: 'Linux',
+        version: '4.4'
       }
     }
 };
@@ -135,7 +153,7 @@ exports.ci1 = {
     singleRun: true,
     browserNoActivityTimeout: 0,
     captureTimeout: 0,
-    browsers: ['SL_Chrome', 'SL_IE_8', 'SL_IE_9', 'SL_Safari_7', 'SL_Android_4.3'],
+    browsers: ['SL_Chrome', 'SL_IE_8', 'SL_IE_9', 'SL_Safari_7', 'SL_Android_4.4'],
     reporters: process.env.TRAVIS_PULL_REQUEST !== 'false' ? ['dots'] : ['dots', 'saucelabs']
 }
 
@@ -148,7 +166,20 @@ exports.ci2 = {
     singleRun: true,
     browserNoActivityTimeout: 0,
     captureTimeout: 0,
-    browsers: ['SL_iOS_7', 'SL_Firefox', 'SL_IE_10', 'SL_IE_11', 'SL_Safari_6'],
+    browsers: ['SL_Firefox', 'SL_iOS_7', 'SL_IE_10', 'SL_IE_11', 'SL_Safari_6', 'SL_Android_4.2'],
+    reporters: process.env.TRAVIS_PULL_REQUEST !== 'false' ? ['dots'] : ['dots', 'saucelabs']
+}
+
+exports.ci3 = {
+    sauceLabs: {
+      startConnect: false,
+      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
+    },
+    transports: ['xhr-polling'],
+    singleRun: true,
+    browserNoActivityTimeout: 0,
+    captureTimeout: 0,
+    browsers: ['SL_Firefox_Beta', 'SL_Chrome_Beta', 'SL_Android_4.0', 'SL_Android_4.1', 'SL_Android_4.3'],
     reporters: process.env.TRAVIS_PULL_REQUEST !== 'false' ? ['dots'] : ['dots', 'saucelabs']
 }
 

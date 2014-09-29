@@ -124,7 +124,10 @@ gulp.task('ci1', ['test'], function (done) {
 gulp.task('ci2', ['ci1'], function (done) {
     karma.start(_.assign({}, karmaConf.common, karmaConf.ci2), done);
 });
-gulp.task('ci', ['ci2'], function () {
+gulp.task('ci3', ['ci2'], function (done) {
+    karma.start(_.assign({}, karmaConf.common, karmaConf.ci3), done);
+});
+gulp.task('ci', ['ci3'], function () {
     //TODO: remove process.exit() here
     process.exit();
 });
