@@ -1,7 +1,7 @@
 var klass = require("hsp/klass");
 
 var TabController = klass({
-    attributes : {
+    $attributes : {
         label : {
             type : "template"
         },
@@ -39,7 +39,7 @@ var TabController = klass({
 });
 
 exports.TabbarController = klass({
-    attributes : {
+    $attributes : {
         index : {
             type : "int",
             defaultValue : 0,
@@ -65,7 +65,7 @@ exports.TabbarController = klass({
             type : "callback"
         }
     },
-    elements : {
+    $elements : {
         "tab" : {
             type : "component",
             controller : TabController
@@ -115,7 +115,7 @@ exports.TabbarController = klass({
     },
 
     activate : function (event, idx) {
-        if (!this.content[idx].disabled) {
+        if (!this.$content[idx].disabled) {
             this._setIndex(idx);
         }
         if (event.preventDefault) {
@@ -125,16 +125,16 @@ exports.TabbarController = klass({
         }
     },
     _getNumberOfTabs : function () {
-        return this.content ? this.content.length : 0;
+        return this.$content ? this.$content.length : 0;
     },
 
-    onIndexChange : function (newIndex) {
+    $onIndexChange : function (newIndex) {
         this._setIndex(newIndex);
     },
 
     _normalizeIndex : function (newIndex) {
 
-        var content = this.content;
+        var content = this.$content;
         var nbTabs = this._tabsCount;
         if (!content || nbTabs === 0) {
             return -1;
@@ -188,7 +188,7 @@ exports.TabbarController = klass({
         newIndex = newIndex == -1 ? null : newIndex;
         this.toggleActivation(oldIndex, newIndex);
     },
-    onContentChange : function (newContent, oldContent) {
+    $on$contentChange : function (newContent, oldContent) {
         this._tabsCount = this._getNumberOfTabs();
         this._setIndex(this._currentIndex);
     },
@@ -196,7 +196,7 @@ exports.TabbarController = klass({
         if (newIndex === null) {
             return;
         }
-        var content = this.content;
+        var content = this.$content;
         this.onshow({
             index : newIndex
         });

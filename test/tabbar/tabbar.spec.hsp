@@ -1,24 +1,25 @@
-var tabbar = require('../../src/tabbar/tabbar.hsp').tabbar;
-var doc = require("hsp/rt/document");
-var $set = require("hsp/$set");
-var hsp = require("hsp/rt");
-var fireEvent = require("hsp/utils/eventgenerator").fireEvent;
+<script>
+    var tabbar = require('../../src/tabbar/tabbar.hsp').tabbar;
+    var doc = require("hsp/rt/document");
+    var $set = require("hsp/$set");
+    var hsp = require("hsp/rt");
+    var fireEvent = require("hsp/utils/eventgenerator").fireEvent;
 
-var controllerClass = require('../../src/tabbar/tabbar.js').TabbarController;
-var controllerInstance = new controllerClass();
-controllerInstance.$init();
-var browserWithTransitions = controllerInstance.actuallyHasTransitions;
-controllerInstance.$dispose();
+    var controllerClass = require('../../src/tabbar/tabbar.js').TabbarController;
+    var controllerInstance = new controllerClass();
+    controllerInstance.$init();
+    var browserWithTransitions = controllerInstance.actuallyHasTransitions;
+    controllerInstance.$dispose();
+</script>
 
-
-{template test(model)}
+<template id="test" args="model">
     <#tabbar
         index="{model.index}"
         noTransition="{model.noTransition}"
         justified="{model.justified}"
         display="{model.display}"
-        onshow="{model.onshowCB(event.index)}"
-        onshown="{model.onshownCB(event.index)}"
+        onshow="{model.onshowCB($event.index)}"
+        onshown="{model.onshownCB($event.index)}"
     >
         {foreach index, tab in model.tabs}
             {if index%2 == 0}
@@ -36,16 +37,14 @@ controllerInstance.$dispose();
         {/foreach}
 
     </#tabbar>
+</template>
 
-{/template}
-
-{template emptyTest(model)}
+<template id="emptyTest" args="model">
     <#tabbar index="{model.index}">
     </#tabbar>
-{/template}
+</template>
 
-
-
+<script>
 describe('Tabbar', function() {
 
     this.timeout(5000);
@@ -383,3 +382,4 @@ describe('Tabbar', function() {
         document.getElementsByTagName("head")[0].appendChild(styleElement);
     }
 });
+</script>

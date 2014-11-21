@@ -1,22 +1,23 @@
-var tabCtrl = require("./tabbar");
-var tabbarController = tabCtrl.TabbarController;
+<script>
+    var tabCtrl = require("./tabbar");
+    var tabbarController = tabCtrl.TabbarController;
+</script>
 
-{export template tabbar using ctrl:tabbarController}
-    <ul class="{'nav', 'nav-tabs': ctrl.tabsClass, 'nav-pills': ctrl.pillsClass, 'nav-stacked': ctrl.stackedClass, 'nav-justified': ctrl.justified}" role="tablist">
-        {foreach idx, tab in ctrl.content}
-            <li class="{'active':idx===ctrl.index, 'disabled': tab.disabled}">
-                <a href="#" role="tab" onclick="{ctrl.activate(event, idx)}"><#tab.label /></a>
+<template id="tabbar" ctrl="tabbarController as ctrl" export>
+    <ul class="nav {{'nav-tabs': ctrl.tabsClass, 'nav-pills': ctrl.pillsClass, 'nav-stacked': ctrl.stackedClass, 'nav-justified': ctrl.justified}}" role="tablist">
+        {foreach idx, tab in ctrl.$content}
+            <li class="{{'active':idx===ctrl.index, 'disabled': tab.disabled}}">
+                <a href="#" role="tab" onclick="{ctrl.activate($event, idx)}"><#tab.label /></a>
             </li>
         {/foreach}
     </ul>
     <div class="tab-content">
-        {foreach tab in ctrl.content}
+        {foreach tab in ctrl.$content}
             {if tab.active}
-                <div class="{'tab-pane', 'active', 'fade': tab._fade, 'in': tab._in}">
+                <div class="tab-pane active {{'fade': tab._fade, 'in': tab._in}}">
                     <#tab.content />
                 </div>
             {/if}
         {/foreach}
     </div>
-{/template}
-
+</template>

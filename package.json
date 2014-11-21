@@ -30,7 +30,7 @@
     "karma-firefox-launcher": "~0.1.3",
     "karma-mocha": "~0.1.3",
     "karma-commonjs": "~0.0.9",
-    "karma-hashspace": "~0.0.2",
+    "karma-hashspace": "~0.0.3",
     "karma-sinon": "~1.0.3",
     "karma-sauce-launcher": "~0.2.9",
     "karma-coverage": "~0.1",
