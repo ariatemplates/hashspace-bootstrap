@@ -1,14 +1,14 @@
 var klass = require("hsp/klass");
 
 var SlideController = new klass({
-    attributes: {
+    $attributes: {
         body: { type: "template", defaultContent: true },
         caption: {type: "template"}
     }
 });
 
 exports.CarouselController = new klass({
-    attributes:{
+    $attributes:{
         //BS options
         "interval": {type: "int", defaultValue:5000, binding: "1-way"},
         "pause": {type: "string", defaultValue: "hover"},
@@ -21,7 +21,7 @@ exports.CarouselController = new klass({
         //Additionals
         "noTransition": {type: "boolean", defaultValue: false}
     },
-    elements: {
+    $elements: {
         "slide": {type: "component", controller: SlideController}
     },
     $init: function() {
@@ -55,7 +55,7 @@ exports.CarouselController = new klass({
         }
     },
     _getNumberOfSlides: function() {
-        return this.content ? this.content.length: 0;
+        return this.$content ? this.$content.length: 0;
     },
     _finalizeTransition: function() {
         if (this.nextIndex !== null) {
@@ -165,7 +165,7 @@ exports.CarouselController = new klass({
             }
         }
     },
-    onIndexChange: function(newValue, oldValue) {
+    $onIndexChange: function(newValue, oldValue) {
         if (this.index >= 0 && this.index < this._getNumberOfSlides()) {
             this._navigateTo(this.index);
         }
@@ -173,13 +173,13 @@ exports.CarouselController = new klass({
             this.index = oldValue;
         }
     },
-    onIntervalChange: function(newValue, oldValue) {
+    $onIntervalChange: function(newValue, oldValue) {
         if (newValue !== oldValue) {
             this._stopCycling();
             this._startCycling();
         }
     },
-    onContentChange: function(newContent, oldContent) {
+    $on$contentChange: function(newContent, oldContent) {
         if (newContent.length !== oldContent.length) {
             var newIndex = newContent.indexOf(oldContent[this.internalIndex]);
             if (newIndex != this.internalIndex && newIndex > -1) {

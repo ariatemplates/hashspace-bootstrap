@@ -1,6 +1,8 @@
-var demos = require('./$demoList').getDemo();
+<script>
+    var demos = require('./$demoList').getDemo();
+</script>
 
-{export template index()}
+<template id="index" export>
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -32,4 +34,4 @@ var demos = require('./$demoList').getDemo();
             {/foreach}
         </div>
     </div>
-{/template}
+</template>

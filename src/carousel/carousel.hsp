@@ -1,21 +1,20 @@
-var CarouselController = require("./carousel").CarouselController;
+<script>
+    require("hsp/gestures/swipe").register();
+    var CarouselController = require("./carousel").CarouselController;
+</script>
 
-{export template carousel using ctrl:CarouselController}
-    <div class="carousel slide" onmouseover="{ctrl.toggleOnHover()}" onmouseout="{ctrl.toggleOnHover()}" onswipe="{ctrl.handleSwipe(event)}">
-        {if ctrl.content.length > 1}
+<template id="carousel" ctrl="CarouselController as ctrl" export>
+    <div class="carousel slide" onmouseover="{ctrl.toggleOnHover()}" onmouseout="{ctrl.toggleOnHover()}" onswipe="{ctrl.handleSwipe($event)}">
+        {if ctrl.$content.length > 1}
             <ol class="carousel-indicators">
-                {foreach idx, slide in ctrl.content}
-                    <li class="{'active': idx === ctrl.internalIndex}" onclick="{ctrl.navigate(idx)}"></li>
+                {foreach idx, slide in ctrl.$content}
+                    <li class="{{'active': idx === ctrl.internalIndex}}" onclick="{ctrl.navigate(idx)}"></li>
                 {/foreach}
             </ol>
         {/if}
         <div class="carousel-inner">
-            {foreach idx, slide in ctrl.content}
-                <div class="{'item','active': idx === ctrl.internalIndex,
-                'prev': idx === ctrl.nextIndex && ctrl.ongoingNavigation === "prev",
-                'next': idx === ctrl.nextIndex && ctrl.ongoingNavigation === "next",
-                'left': (idx === ctrl.internalIndex || idx === ctrl.nextIndex) && ctrl.navigationDirection === "left",
-                'right':(idx === ctrl.internalIndex || idx === ctrl.nextIndex) && ctrl.navigationDirection === "right"}">
+            {foreach idx, slide in ctrl.$content}
+                <div class="item {{'active': idx === ctrl.internalIndex, 'prev': idx === ctrl.nextIndex && ctrl.ongoingNavigation === "prev", 'next': idx === ctrl.nextIndex && ctrl.ongoingNavigation === "next", 'left': (idx === ctrl.internalIndex || idx === ctrl.nextIndex) && ctrl.navigationDirection === "left", 'right':(idx === ctrl.internalIndex || idx === ctrl.nextIndex) && ctrl.navigationDirection === "right"}}">
                     <#slide.body/>
                     {if slide.caption}
                         <div class="carousel-caption">
@@ -36,4 +35,4 @@ var CarouselController = require("./carousel").CarouselController;
             </a>
         {/if}
     </div>
-{/template}
+</template>

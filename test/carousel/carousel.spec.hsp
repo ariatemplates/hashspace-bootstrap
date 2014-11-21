@@ -1,11 +1,13 @@
-var carousel = require('../../src/carousel/carousel.hsp').carousel;
-var doc = require("hsp/rt/document");
-var $set = require("hsp/$set");
-var hsp = require("hsp/rt");
-var fireEvent=require("hsp/utils/eventgenerator").fireEvent;
-var touchEventMap = require("hsp/gestures/touchEvent").touchEventMap;
+<script>
+    var carousel = require('../../src/carousel/carousel.hsp').carousel;
+    var doc = require("hsp/rt/document");
+    var $set = require("hsp/$set");
+    var hsp = require("hsp/rt");
+    var fireEvent=require("hsp/utils/eventgenerator").fireEvent;
+    var touchEventMap = require("hsp/gestures/touchEvent").touchEventMap;
+</script>
 
-{template test(model)}
+<template id="test" args="model">
     <#carousel interval="{model.interval}" index="{model.index}" noTransition="{model.noTransition}" wrap="{model.wrap}" pause="{model.pause}" 
     onslidestart="{model.onslidestartCB()}" onslideend="{model.onslideendCB()}">
         {if model.nbOfSlides > 0}
@@ -44,10 +46,9 @@ var touchEventMap = require("hsp/gestures/touchEvent").touchEventMap;
             {/if}
         {/if}
     </#carousel>
-{/template}
+</template>
 
-
-
+<script>
 describe('Carousel', function() {
     var container;
     var template;
@@ -368,3 +369,4 @@ describe('Carousel', function() {
         }, 300);
     });
 });
+</script>

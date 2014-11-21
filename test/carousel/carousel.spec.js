@@ -12,7 +12,7 @@ describe('Carousel controller', function() {
         ctrl.index = 0;
         ctrl.noTransition = true;
         //Set elements
-        ctrl.content = ["Slide1", "Slide2", "Slide3"];
+        ctrl.$content = ["Slide1", "Slide2", "Slide3"];
         //Execute $init
         ctrl.$init();
     });
@@ -60,10 +60,10 @@ describe('Carousel controller', function() {
     it('should not update index if out of range', function() {
         expect(ctrl.index).to.be(0);
         ctrl.index = 4;
-        ctrl.onIndexChange(4, 0);
+        ctrl.$onIndexChange(4, 0);
         expect(ctrl.index).to.be(0);
         ctrl.index = -1;
-        ctrl.onIndexChange(-1, 0);
+        ctrl.$onIndexChange(-1, 0);
         expect(ctrl.index).to.be(0);
     });
 
@@ -83,9 +83,9 @@ describe('Carousel controller', function() {
 
     function addSlideAndValidate(currentIndex, newSlideIndex, expectedIndex) {
         ctrl.index = ctrl.internalIndex = currentIndex;
-        var newContent = JSON.parse(JSON.stringify(ctrl.content));
+        var newContent = JSON.parse(JSON.stringify(ctrl.$content));
         newContent.splice(newSlideIndex, 0, "NewSlide");
-        ctrl.onContentChange(newContent, ctrl.content);
+        ctrl.$on$contentChange(newContent, ctrl.$content);
         expect(ctrl.index).to.be(expectedIndex);
     }
 
@@ -106,9 +106,9 @@ describe('Carousel controller', function() {
 
     function removeSlideAndValidate(currentIndex, removedSlideIndex, expectedIndex) {
         ctrl.index = ctrl.internalIndex = currentIndex;
-        var newContent = JSON.parse(JSON.stringify(ctrl.content));
+        var newContent = JSON.parse(JSON.stringify(ctrl.$content));
         newContent.splice(removedSlideIndex, 1);
-        ctrl.onContentChange(newContent, ctrl.content);
+        ctrl.$on$contentChange(newContent, ctrl.$content);
         expect(ctrl.index).to.be(expectedIndex);
     }
 

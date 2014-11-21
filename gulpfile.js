@@ -35,7 +35,7 @@ function startWWWServer(folder) {
 
 function html2hsp() {
     return through2.obj(function(file, encoding, done) {
-        var content = "{export template description()}\r\n" + String(file.contents).replace(/<table>/g, '<table class="table table-bordered">') + "\r\n{/template}";
+        var content = '<template id="description" export>\r\n' + String(file.contents).replace(/<table>/g, '<table class="table table-bordered">') + "\r\n</template>";
         file.contents = new Buffer(content);
         file.path = gutil.replaceExtension(file.path, ".hsp");
         this.push(file);
@@ -74,7 +74,7 @@ gulp.task('play', ['build'], function () {
         files.pipe(markdown().on('error', gutil.log)).pipe(html2hsp()).pipe(hsp.compile()).pipe(gulp.dest(_devFolder ));
     });
     watch({glob: 'demo/samples/**/*.+(hsp|js)'}, function (files) {
-        files.pipe(hsp.compile().on('error', gutil.log)).pipe(gulp.dest(_devFolder + '/samples'));
+        files.pipe(hsp.process().on('error', gutil.log)).pipe(gulp.dest(_devFolder + '/samples'));
     });
     watch({glob: 'demo/+(css|lib)/**/*.*'}, function (files) {
         files.pipe(gulp.dest(_devFolder));

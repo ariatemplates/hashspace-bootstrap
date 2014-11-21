@@ -1,6 +1,8 @@
-var carousel = require('../../carousel/carousel.hsp').carousel;
+<script>
+    var carousel = require('../../carousel/carousel.hsp').carousel;
+</script>
 
-{export template demo()}
+<template id="demo" export>
     {let slideIndex = 0}
     {let slideInterval = 2000}
     <#carousel interval="{slideInterval}" index="{slideIndex}">
@@ -37,4 +39,4 @@ var carousel = require('../../carousel/carousel.hsp').carousel;
             <input type="number" class="form-control" id="intervalField" value="{slideInterval}">
         </div>
     </form>
-{/template}
+</template>

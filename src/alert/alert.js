@@ -1,7 +1,7 @@
 var klass = require("hsp/klass");
 
 exports.AlertController = new klass({
-    attributes : {
+    $attributes : {
         "closebutton" : {
             type : "boolean",
             defaultValue : true,
@@ -38,12 +38,16 @@ exports.AlertController = new klass({
         this.transitionEnd = this.getTransitionEnd();
         this._hasTransitions = (this.transitionEnd && this.fade);
         this.fadeClass = (this._hasTransitions) ? 'fade in' : '';
+        this.typeClass = "alert-" + this.type;
     },
     $refresh : function () {},
     _onclose : function () {
         this.closed = true;
     },
-    onClosedChange : function () {
+    $onTypeChange: function () {
+        this.typeClass = "alert-" + this.type;
+    },
+    $onClosedChange : function () {
         if (this.closed) {
             this.onclose();
         } else {
