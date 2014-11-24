@@ -1,0 +1,114 @@
+<script>
+    var alert = require('../../src/alert/alert.hsp').alert;
+    var doc = require("hsp/rt/document");
+    var $set = require("hsp/$set");
+    var hsp = require("hsp/rt");
+    var fireEvent=require("hsp/utils/eventgenerator").fireEvent;
+    var touchEventMap = require("hsp/gestures/touchEvent").touchEventMap;
+</script>
+
+<template id="test" args="model">
+    <#alert type="{model.type}" fade="{model.fade}" closebutton="{model.closebutton}" closed="{model.closed}" onclosestart="{model.onclosestartCB()}" oncloseend="{model.oncloseendCB()}">
+        I am an alert without any closing transition - close me and I just disappear!
+    </#alert>
+</template>
+
+<script>
+describe('Alert', function() {
+    var container;
+    var template;
+    var model;
+    beforeEach(function(){
+        container = doc.createElement("div");
+    });
+    afterEach(function() {
+        if (template.root) {
+            template.$dispose();
+        }
+        template = null;
+        container = null;
+    });
+
+    function instantiateTemplate(input) {
+        var closebutton = typeof input.closebutton === "undefined" ? true : input.closebutton;
+        var fade = typeof input.fade === "undefined" ? true : input.fade;
+        var type = typeof input.type === "undefined" ? "danger" : input.type;
+        var closed = typeof input.closed === "undefined" ? false : input.closed;
+        model = {closebutton: closebutton, fade: fade, type: type, closed: closed, onclosestartCB: function(){}, oncloseendCB: function(){}};
+        template = test(model);
+        template.render(container);
+    }
+
+    function getAlert() {
+        return container.querySelectorAll("div.alert");
+    }
+    function getCloseButton() {
+        return container.querySelectorAll("button.close");
+    }
+
+    it('should display an alert with dynamic type and close button', function() {
+        instantiateTemplate({});
+        expect(getCloseButton()).to.have.length(1);
+        expect(getAlert()[0].className.indexOf("alert-danger") > -1).to.be.ok();
+
+        $set(model, "type", "info");
+        hsp.refresh();
+        expect(getCloseButton()).to.have.length(1);
+        expect(getAlert()[0].className.indexOf("alert-info") > -1).to.be.ok();
+
+        $set(model, "closebutton", false);
+        hsp.refresh();
+        expect(getCloseButton()).to.have.length(0);
+        expect(getAlert()[0].className.indexOf("alert-info") > -1).to.be.ok();
+    });
+
+    it('should close the alert when clicking the close button', function() {
+        instantiateTemplate({fade: false});
+        sinon.spy(model, "onclosestartCB");
+        sinon.spy(model, "oncloseendCB");
+        expect(model.onclosestartCB.called).not.to.be.ok();
+        expect(model.oncloseendCB.called).not.to.be.ok();
+
+        var closeButton = getCloseButton()[0];
+        expect(getAlert()).to.have.length(1);
+        expect(model.closed).not.to.be.ok();
+
+        fireEvent("click", closeButton);
+        hsp.refresh();
+        expect(getAlert()).to.have.length(0);
+        expect(model.closed).to.be.ok();
+        expect(model.onclosestartCB.calledOnce).to.be.ok();
+        expect(model.oncloseendCB.calledOnce).to.be.ok();
+
+        $set(model, "closed", false);
+        hsp.refresh();
+        expect(getAlert()).to.have.length(1);
+        expect(model.onclosestartCB.calledOnce).to.be.ok();
+        expect(model.oncloseendCB.calledOnce).to.be.ok();
+    });
+
+    it('should fade correctly', function(done) {
+        container = window.document.body;
+        var cssCode = ".fade{opacity:0;-webkit-transition:opacity 100ms linear;transition:opacity 100ms linear}.fade.in{opacity:1}";
+        var styleElement = document.createElement("style");
+        styleElement.type = "text/css";
+        if (styleElement.styleSheet) {
+            styleElement.styleSheet.cssText = cssCode;
+        } else {
+            styleElement.appendChild(document.createTextNode(cssCode));
+        }
+        document.getElementsByTagName("head")[0].appendChild(styleElement);
+        
+        instantiateTemplate({});
+        setTimeout(function() {
+            var closeButton = getCloseButton()[0];
+            expect(getAlert()).to.have.length(1);
+            fireEvent("click", closeButton);           
+            setTimeout(function() {
+                expect(getAlert()).to.have.length(0);
+                done();
+            }, 200);
+        }, 200);
+    });
+});
+</script>
